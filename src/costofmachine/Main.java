@@ -43,7 +43,7 @@ public class Main extends JFrame {
 				try {
 					
 
-					text = "190521";
+					text = "190522";
 					
 					CountMaterial2test.run();
 

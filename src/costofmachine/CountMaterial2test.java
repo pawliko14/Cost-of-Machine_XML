@@ -2,6 +2,7 @@ package costofmachine;
 
 
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -10,7 +11,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,151 +24,179 @@ import java.util.TreeMap;
 
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class CountMaterial2test {
 	 static String MASZYNA = Main.text; // na sztywno, potem mozliwosc zmiany w gui
-
-	// private static ArrayList<ArrayList<String>> FirstLevelNomencaltuur;
-	// private static ArrayList<String> FirstLevelNomencaltuur_temporary;
-//	 private static boolean EmptyStrukture;
+	 static String Maszynka ="190521";
 	 
-//	 private static ArrayList<Struktury> ListOfCheckedArticels;
-	 
-//	 private static ArrayList<List<Struktury>> ListofStructures;
-	 
-//	 private static Struktury ArtZgodnyZkolejnoscia;
-	 
-	 static String Maszynka;
-	 
-	 private static ArrayList<String> ListaGlownychZlozen;
+	 static String GlownyProjektDlaArtykulu = "";
 	 
 	 private static Map<String,String> ListaGlownychZlozenIPodzlozen;
 
 	 //testowa struktura, na potrzeby programu Asi
 	 private static ArrayList<Struktury>ListofStructuresTest;
-	 private static int iloscZaglebien;
-
+	 private static int iloscZaglebien = 0;
 	 
-		public static void run() throws DocumentException, IOException {
+	 private static Double CalosciowaCenaPracy = 0.0;
+	 private static Double CalosciowaCenaKonstrukcja = 0.0;
+	 private static Double CalosciowaCenaProgramisciCNC = 0.0;
+	 private static Double CalosciowaCenaElektronicy = 0.0;
+
+	 private static Double CalosciowaCenaMaterialu = 0.0;
+	 
+	 private static int CenaPracoGodziny = 120; // kiedys, dowiedziec sie kiedy cena pracy to bylo 100zl, aktualnie jest 120zl
+	 
+	 
+		public static void run() throws DocumentException, IOException, SQLException {
+			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
 			try {
-			//	EmptyStrukture = false;
-				Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
 				
-			//	 ListOfCheckedArticels = new ArrayList<Struktury>();
-				
+							
 					
-					
-					 ListofStructuresTest = new ArrayList<Struktury>();
-					 iloscZaglebien= 0;
-					 
-					 Maszynka = "190523";
-					 
-					 ListaGlownychZlozen = new ArrayList<String>();
+					 ListofStructuresTest = new ArrayList<Struktury>();				 			 
 					 
 					 ListaGlownychZlozenIPodzlozen = new LinkedHashMap<String,String>(); // LinkedHashMap - preserver the insertion order, have to used Linked one
 					 getListaGLownychZlozen(Maszynka,conn);
 
 					
 					 		//remove not working structure
-						for(int i = 0 ; i < ListaGlownychZlozen.size();i++)
-							if(ListaGlownychZlozen.get(i).equals("%%360A-030-4000/000"))
-								ListaGlownychZlozen.remove(i);
+//						for(int i = 0 ; i < ListaGlownychZlozen.size();i++)
+//							if(ListaGlownychZlozen.get(i).equals("%%360A-030-4000/000"))
+//								ListaGlownychZlozen.remove(i);
 							
 										Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
 										int it = 0;
 										for(Entry<String, String> entry: entrySet) {
+											GlownyProjektDlaArtykulu = entry.getValue();
 											System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
-											getPrice(entry.getKey(),conn);		
+											GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);		
 											iloscZaglebien= 0; // reset deppth of the structure
 											it++;
-										}
+										}					
 						
-						
-//							//iterate over structure
-//						for(int i = 0 ; i < ListaGlownychZlozen.size();i++)
-//						{
-//							System.out.println("zlozenie: "+ ListaGlownychZlozen.get(i));
-//							getPrice(ListaGlownychZlozen.get(i),conn);	
-//							iloscZaglebien= 0; // reset deppth of the structure
-//						}	
-//					 
-				
-										
-
-						
-						
-					 
-					for(int i = 0 ; i < ListofStructuresTest.size();i++)
-					{
-																			
-						
-							String artikelkod = ListofStructuresTest.get(i).getONDERDEEL();
-							
-							
-							Statement b = conn.createStatement();
-							ResultSet rs2 = b.executeQuery("select ARTIKELCODE,MATERIAAL,LONEN from artikel_kostprijs where ARTIKELCODE = '"+artikelkod+"' and SOORT = '4'");
-							
-							if (!rs2.isBeforeFirst() ) {    									
-								ListofStructuresTest.get(i).setCenaRazyIlosc(0.0);
-							}
-							else
-							{
-								while(rs2.next())
-								{
-									
-								
-								ListofStructuresTest.get(i).setCenaMaterialu(Double.parseDouble(rs2.getString("MATERIAAL")));
-								Double cena = ListofStructuresTest.get(i).getCenaMaterialu();
-								Double ilosc = ListofStructuresTest.get(i).getILOSC();
-	
-								
-								Double cenaRazyIlosc = cena * ilosc;				
-								ListofStructuresTest.get(i).setCenaRazyIlosc(cenaRazyIlosc);
-								
-								
-								ListofStructuresTest.get(i).setCenaPracy((Double.parseDouble(rs2.getString("LONEN"))));
-
-								
-								}
-							}
-							b.close();
-							rs2.close();
-						
-					}
-					
-					try (PrintStream out = new PrintStream(new FileOutputStream("C:\\Users\\el08\\Desktop\\programiki\\Moneyy.txt")))
-					{					
-						for(int i = 0 ; i <ListofStructuresTest.size();i++ )
-						{
-							out.println("---Poziom---: " + ListofStructuresTest.get(i).getPoziom());
-							out.println("Seqwencja: " + ListofStructuresTest.get(i).getSeq());
-							out.println("ARTIKELCODE: " + ListofStructuresTest.get(i).getARTIKELCODE());
-							out.println("ONDERDEEL: " + ListofStructuresTest.get(i).getONDERDEEL());
-							out.println("CFOMSONDERDEEL: " + ListofStructuresTest.get(i).getCFOMSONDERDEEL());
-							out.println("TYP: " + ListofStructuresTest.get(i).getTYP());
-							out.println("ILOSC: " + ListofStructuresTest.get(i).getILOSC());
-							out.println("JEDNOSTKA: " + ListofStructuresTest.get(i).getJEDNOSTKA());
-							out.println("Czy sprawdzony?: " + ListofStructuresTest.get(i).isCzySprawdzony());
-							out.println("CenaMaterialu: " + ListofStructuresTest.get(i).getCenaMaterialu());
-							out.println("CenaMaterialuRazyIlosc: " + ListofStructuresTest.get(i).getCenaRazyIlosc());
-							out.println("Cena Pracy: " + ListofStructuresTest.get(i).getCenaPracy());
-							out.println("                              ");
-						}
-					}				 
+									GetAllPrices(conn);									
+									ShowAll();
+	 							 
 			}
 			catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-				
+			
+			PodsumowanieKoncowe();
+			GetCenaKonstrukcja_CNC_Elektronicy(conn);			
+			Podsumowanie();
+			
+			
+			// generowanie dokumentu
+			GenerateDocument dokumencik = new GenerateDocument();
+			dokumencik.Generate(ListofStructuresTest, conn, Maszynka);
+					
+			
 			System.out.println("done");
 	}
 		
 		
-		public static void getPrice(String articlecode,Connection conn) throws SQLException{
+		private static void ShowAll() throws FileNotFoundException {
+			
+			try (PrintStream out = new PrintStream(new FileOutputStream("C:\\Users\\el08\\Desktop\\programiki\\Moneyy.txt")))
+			{					
+				for(int i = 0 ; i <ListofStructuresTest.size();i++ )
+				{
+					out.println("---Poziom---: " + ListofStructuresTest.get(i).getPoziom());
+					out.println("Glowny Projekt: " + ListofStructuresTest.get(i).getGlownyProjekt());
+					out.println("Seqwencja: " + ListofStructuresTest.get(i).getSeq());
+					out.println("Artikel Nadrzedny: " + ListofStructuresTest.get(i).getARTIKELCODE());
+					out.println("Artikel: " + ListofStructuresTest.get(i).getONDERDEEL());
+					out.println("Opis Artikel: " + ListofStructuresTest.get(i).getCFOMSONDERDEEL());
+					out.println("TYP: " + ListofStructuresTest.get(i).getTYP());
+					out.println("ILOSC: " + ListofStructuresTest.get(i).getILOSC());
+					out.println("JEDNOSTKA: " + ListofStructuresTest.get(i).getJEDNOSTKA());
+					out.println("Czy sprawdzony?: " + ListofStructuresTest.get(i).isCzySprawdzony());
+					out.println("CenaMaterialu: " + ListofStructuresTest.get(i).getCenaMaterialu());
+					out.println("CenaMaterialu Razy Ilosc: " + ListofStructuresTest.get(i).getCenaMaterialuRazyIlosc());
+					out.println("Cena Pracy Za sztuke: " + ListofStructuresTest.get(i).getCenaPracy());
+					out.println("Cena Pracy Razy Ilosc: " + ListofStructuresTest.get(i).getCenaPracyRazyIlosc());
+					out.println("                              ");
+				}
+			}
+			
+		}
 
 
+		private static void GetAllPrices(Connection conn) throws SQLException {
+			
+			for(int i = 0 ; i < ListofStructuresTest.size();i++)
+			{															
+					String artikelkod = ListofStructuresTest.get(i).getONDERDEEL();
+					
+					
+					Statement b = conn.createStatement();
+					ResultSet rs2 = b.executeQuery("select ARTIKELCODE,MATERIAAL,LONEN from artikel_kostprijs where ARTIKELCODE = '"+artikelkod+"' and SOORT = '4'");
+					
+					if (!rs2.isBeforeFirst() ) {    									
+						ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(0.0);
+						ListofStructuresTest.get(i).setCenaMaterialu(0.0);
+						ListofStructuresTest.get(i).setCenaPracy(0.0);
+					}
+					else
+					{
+						while(rs2.next())
+						{
+							
+						if(rs2.getString("MATERIAAL").equals("")|| rs2.getString("MATERIAAL").equals(null))
+						{
+							ListofStructuresTest.get(i).setCenaMaterialu(0.0);
+						}
+						else
+						{
+							ListofStructuresTest.get(i).setCenaMaterialu(Double.parseDouble(rs2.getString("MATERIAAL")));
+						}
+						Double cena = ListofStructuresTest.get(i).getCenaMaterialu();
+						Double ilosc = ListofStructuresTest.get(i).getILOSC();
+
+						
+						Double cenaRazyIlosc = cena * ilosc;				
+						ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(cenaRazyIlosc);
+						
+						if(rs2.getString("LONEN").equals("")|| rs2.getString("LONEN").equals(null))
+						{
+							ListofStructuresTest.get(i).setCenaPracy(0.0);	
+						}
+						else
+						{
+							ListofStructuresTest.get(i).setCenaPracy(Double.parseDouble(rs2.getString("LONEN")));
+
+						}
+						Double cenaPracySzt = ListofStructuresTest.get(i).getCenaPracy();
+						Double pracaRazyIlosc = cenaPracySzt * ilosc;
+						
+						ListofStructuresTest.get(i).setCenaPracyRazyIlosc(pracaRazyIlosc);
+						
+						//Add to summary:
+						CalosciowaCenaPracy += ListofStructuresTest.get(i).getCenaPracyRazyIlosc();
+						CalosciowaCenaMaterialu += ListofStructuresTest.get(i).getCenaMaterialuRazyIlosc();
+						}
+					}
+					b.close();
+					rs2.close();			
+			}		
+		}
+
+
+		public static void GetAllArticelInProject(String articlecode,Connection conn, String GlownyProjekt) throws SQLException{
+
+			String G = GlownyProjekt;
 			
 			Statement b = conn.createStatement();			
 			ResultSet rs2 = b.executeQuery("select seq,ARTIKELCODE,ONDERDEEL,CFOMSONDERDEEL,TYP,ILOSC,JEDNOSTKA from struktury where ARTIKELCODE = '"+articlecode+"' order by seq");
@@ -176,6 +207,7 @@ public class CountMaterial2test {
 			while(rs2.next()){							
 				
 				StrukturaTmp = new Struktury(iloscZaglebien); // 0 mean level 0 
+				StrukturaTmp.setGlownyProjekt(G);
 				StrukturaTmp.setSeq(rs2.getString("seq"));
 				StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
 				StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
@@ -205,7 +237,7 @@ public class CountMaterial2test {
 				
 				if(rs2.getString("typ").equals("F")||rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P")){			
 					iloscZaglebien++;
-					getPrice(rs2.getString("onderdeel"),conn);
+					GetAllArticelInProject(rs2.getString("onderdeel"),conn,G);
 				}
 			}
 			}
@@ -224,18 +256,89 @@ public class CountMaterial2test {
 			ResultSet rs2 = b.executeQuery("select ARTIKELCODE, ONDERDEEL from struktury where ARTIKELCODE like '"+art+"%' order by seq asc ");
 			
 			while(rs2.next()){
-			//	ListaGlownychZlozen.add(rs2.getString("ONDERDEEL"));
 				ListaGlownychZlozenIPodzlozen.put(rs2.getString("ONDERDEEL"), rs2.getString("ARTIKELCODE"));
 			}
 			b.close();
 			rs2.close();
 			
 		 }
-
-
 		
+		public static void PodsumowanieKoncowe()
+		{
+			System.out.println("Podsumowanie Koncowe:");
+			System.out.println("Cena pracy(wszystko):" + CalosciowaCenaPracy);
+			System.out.println("Cena Materialu(wszystko):" + CalosciowaCenaMaterialu);
 
+			
+			
+		}
 		
+		public static void Podsumowanie()
+		{
+			Double EUro = 4.2;
+			System.out.println("Podsumowanie :");
+			Double cenafinalnaPLN = CalosciowaCenaKonstrukcja+CalosciowaCenaElektronicy+CalosciowaCenaProgramisciCNC+CalosciowaCenaPracy+CalosciowaCenaMaterialu;
+			System.out.println("Podsumowanie Koncowe:"+ cenafinalnaPLN + " PLN");
+			
+			Double cenafinalnaEUR = cenafinalnaPLN / EUro ;
+			System.out.println("Podsumowanie Koncowe:"+ cenafinalnaEUR + " EUR");
+
+
+		}
+
+		public static void GetCenaKonstrukcja_CNC_Elektronicy(Connection conn) throws SQLException
+		{
+			
+			//String sql_b = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost NOT IN ('KM01', 'KE01', 'CNC') and (cfproject like '"+Maszynka+"%')";
+			String sql_e = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'KM01' and (cfproject like '%"+Maszynka+"%')";
+			String sql_f = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'KE01' and (cfproject like '%"+Maszynka+"%')";
+			String sql_g = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'CNC' and (cfproject like '%"+Maszynka+"%')";
+		
+			
+//			//koszt montazu
+//			Statement b = conn.createStatement();
+//			ResultSet rs1 = b.executeQuery(sql_b);
+//			while(rs1.next()) {
+//				montage+=rs1.getDouble(1);
+//			}
+//			rs1.close();
+//			b.close();
+			
+			//koszt konstrukcji
+			Statement e = conn.createStatement();
+			ResultSet rs5 = e.executeQuery(sql_e);
+			while(rs5.next()) {
+				CalosciowaCenaKonstrukcja+=rs5.getDouble(1);
+			}
+			rs5.close();
+			e.close();
+			
+			//koszt elektrykow
+			Statement f = conn.createStatement();
+			ResultSet rs6 = f.executeQuery(sql_f);
+			while(rs6.next()) {
+				CalosciowaCenaElektronicy+=rs6.getDouble(1);
+			}
+			rs6.close();
+			f.close();
+			
+			//koszt cnc
+			Statement g = conn.createStatement();
+			ResultSet rs7 = g.executeQuery(sql_g);
+			while(rs7.next()) {
+				CalosciowaCenaProgramisciCNC+=rs7.getDouble(1);
+			}
+			rs7.close();
+			g.close();
+			
+			
+			System.out.println("Podsumowanie Koncowe:");
+			System.out.println("Cena pracy(Konstrukcja):" + CalosciowaCenaKonstrukcja);
+			System.out.println("Cena pracy(elektrykow):" + CalosciowaCenaElektronicy);
+			System.out.println("Cena pracy(CNC):" + CalosciowaCenaProgramisciCNC);
+			
+		}
+				
 }
 
 

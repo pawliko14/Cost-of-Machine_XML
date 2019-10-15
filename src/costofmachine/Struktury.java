@@ -11,19 +11,27 @@ public class Struktury {
 	private Double ILOSC;
 	private String JEDNOSTKA;
 	private String CFOMSONDERDEEL;
-	
 	private Integer Poziom;
 	private String PreviousArikel;
-	
 	private Double CenaMaterialu;
-	
-	private Double CenaRazyIlosc;
-	
+	private Double CenaMaterialuRazyIlosc;
 	private boolean CzySprawdzony;
-	
 	private Double CenaPracy;
+	
+	private String GlownyProjekt;
+
+	private Double CenaPracyRazyIlosc;
 
 	
+	
+	public String getGlownyProjekt() {
+		return GlownyProjekt;
+	}
+
+	public void setGlownyProjekt(String glownyProjekt) {
+		GlownyProjekt = glownyProjekt;
+	}
+
 	public Double getCenaPracy() {
 		return CenaPracy;
 	}
@@ -32,12 +40,12 @@ public class Struktury {
 		CenaPracy = cenaPracy;
 	}
 
-	public Double getCenaRazyIlosc() {
-		return CenaRazyIlosc;
+	public Double getCenaMaterialuRazyIlosc() {
+		return CenaMaterialuRazyIlosc;
 	}
 
-	public void setCenaRazyIlosc(Double cenaRazyIlosc) {
-		CenaRazyIlosc = cenaRazyIlosc;
+	public void setCenaMaterialuRazyIlosc(Double cenaRazyIlosc) {
+		CenaMaterialuRazyIlosc = cenaRazyIlosc;
 	}
 
 	
@@ -45,11 +53,9 @@ public class Struktury {
 		return CenaMaterialu;
 	}
 
-	public void setCenaMaterialu(Double string) {
-		CenaMaterialu = string;
+	public void setCenaMaterialu(Double cena) {
+		CenaMaterialu = cena;
 	}
-	
-	
 	
 	public boolean isCzySprawdzony() {
 		return CzySprawdzony;
@@ -138,17 +144,20 @@ public class Struktury {
 			
 			   
 			System.out.println("---Poziom---: " + this.Poziom);
+			System.out.println("Glowny projekt: " + this.GlownyProjekt);
 			System.out.println("Seqwencja: " + this.seq);
-			System.out.println("ARTIKELCODE: " + this.ARTIKELCODE);
-			System.out.println("ONDERDEEL: " + this.ONDERDEEL);
-			System.out.println("CFOMSONDERDEEL: " + this.CFOMSONDERDEEL);
+			System.out.println("Artikel Nadrzedny: " + this.ARTIKELCODE);
+			System.out.println("Artikel: " + this.ONDERDEEL);
+			System.out.println("Opis Artikel: " + this.CFOMSONDERDEEL);
 			System.out.println("TYP: " + this.TYP);
 			System.out.println("ILOSC: " + this.ILOSC);
 			System.out.println("JEDNOSTKA: " + this.JEDNOSTKA);
 			System.out.println("Czy sprawdzony?: " + this.CzySprawdzony);
 			System.out.println("CenaMaterialu: " + this.CenaMaterialu);
-			System.out.println("CenaMaterialuRazyIlosc: " + this.CenaRazyIlosc);
-			System.out.println("Cena Pracy: " + this.CenaPracy);
+			System.out.println("Cena Materialu Razy Ilosc: " + this.CenaMaterialuRazyIlosc);
+			System.out.println("Cena Pracy za szt: " + this.CenaPracy);
+			System.out.println("Cena Pracy Razy Ilosc: " + this.CenaPracyRazyIlosc);
+
 
 			System.out.println("                              ");
 			
@@ -157,6 +166,14 @@ public class Struktury {
 	public void ShowLevel()
 	{
 		System.out.println("---Poziom---: " + this.Poziom);
+	}
+
+	public Double getCenaPracyRazyIlosc() {
+		return CenaPracyRazyIlosc;
+	}
+
+	public void setCenaPracyRazyIlosc(Double cenaPracyRazyIlosc) {
+		CenaPracyRazyIlosc = cenaPracyRazyIlosc;
 	}
 
 	
