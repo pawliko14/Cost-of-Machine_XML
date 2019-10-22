@@ -47,7 +47,7 @@ public class countCost {
 		try {
 
 			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/test","listy","listy1234");
-			String dest = "C://Users/el08/Desktop/programiki/Cost_of_machine/Analiza_maszyn.pdf";
+			String dest = Parameters.getPathOfSavingAnaliza_MaszynPDF();
 			
 			System.out.println("\ngenerowanie PDf1\n");
 			// GENEROWANIE DOKUMENTU PDF

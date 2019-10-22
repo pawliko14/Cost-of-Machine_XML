@@ -37,7 +37,12 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class CountMaterial2test {
 	 static String MASZYNA = Main.text; // na sztywno, potem mozliwosc zmiany w gui
-	 static String Maszynka ="190521";
+	// static String Maszynka ="190521";
+	// static String Maszynka = "170700";
+	// static String Maszynka ="190522"; // jakis problem brakuje kolejnosci jak w poprzednich przykladach
+	 static String Maszynka ="190555";
+
+
 	 
 	 static String GlownyProjektDlaArtykulu = "";
 	 
@@ -59,6 +64,8 @@ public class CountMaterial2test {
 	 
 		public static void run() throws DocumentException, IOException, SQLException {
 			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
+			
+			
 			try {
 				
 							
@@ -67,6 +74,8 @@ public class CountMaterial2test {
 					 
 					 ListaGlownychZlozenIPodzlozen = new LinkedHashMap<String,String>(); // LinkedHashMap - preserver the insertion order, have to used Linked one
 					 getListaGLownychZlozen(Maszynka,conn);
+					 
+						
 
 					
 					 		//remove not working structure
@@ -103,13 +112,30 @@ public class CountMaterial2test {
 			dokumencik.Generate(ListofStructuresTest, conn, Maszynka);
 					
 			
+			
+			// ---------------------------------------------------------------
+			// sprawdzenie afterkalkulacji -> czyli kalkulacji koncowej(storenotesdetail)
+			// ---------------------------------------------------------------
+
+//			GetDataFromAftercalculations AfterCalculationsObiekt = new GetDataFromAftercalculations();
+//			
+//			AfterCalculationsObiekt.GetWholeData_from_storenotesDetail(conn, Maszynka);
+//			AfterCalculationsObiekt.GetWholeData_from_receptie(conn, Maszynka);
+//				
+//			ArrayList<AfterCalculationsStrukture> tescik = AfterCalculationsObiekt.PrzekazObiekt();
+//			
+//			AfterCalculationsObiekt.ShowAllInList(tescik);		
+//			AfterCalculationsObiekt.PrintTofile(tescik);
+//			
+			
+			
 			System.out.println("done");
 	}
 		
 		
 		private static void ShowAll() throws FileNotFoundException {
 			
-			try (PrintStream out = new PrintStream(new FileOutputStream("C:\\Users\\el08\\Desktop\\programiki\\Moneyy.txt")))
+			try (PrintStream out = new PrintStream(new FileOutputStream(Parameters.getPathOfSavingNomenclatuurTxt())))
 			{					
 				for(int i = 0 ; i <ListofStructuresTest.size();i++ )
 				{
@@ -133,8 +159,141 @@ public class CountMaterial2test {
 			
 		}
 
+		// dlugosc wykonywania operacji jest zbyt dlugi do testowania ( ostatni run trwal 1,5h)
 
-		private static void GetAllPrices(Connection conn) throws SQLException {
+//		private static void GetAllPrices(Connection conn) throws SQLException {
+//			
+//			// get from calendar begin date ( data produkcji) and ends date( data koniec montazu)
+//			
+//			String BeginDate = "";
+//			String EndDate = "";
+//			
+//			Statement state = conn.createStatement();
+//			ResultSet result = state.executeQuery("select DataProdukcji, DataKoniecMontazu from calendar where NrMaszyny like  '%"+Maszynka+"' order by NrMaszyny desc limit 1"); // in this case it is not sure that it will be 2/
+//			
+//			while(result.next())
+//			{
+//				BeginDate =result.getString("DataProdukcji");
+//				EndDate =result.getString("DataKoniecMontazu");
+//			}
+//			state.close();
+//			result.close();
+//			
+//			System.out.println("Data pocza: "+ BeginDate);
+//			System.out.println("Data koniec: "+ EndDate);
+//
+//			
+//			
+//		//	for(int i = 0 ; i < ListofStructuresTest.size();i++)
+//			for(int i = 0 ; i < ListofStructuresTest.size();i++)
+//			{						
+//				
+//			//	System.out.println("Element z listy: "+ ListofStructuresTest.get(i).getARTIKELCODE());
+//
+//				
+//					String artikelkod = ListofStructuresTest.get(i).getONDERDEEL();
+//					
+//					
+//					Statement b = conn.createStatement();
+//				//	ResultSet rs2 = b.executeQuery("select ARTIKELCODE,MATERIAAL,LONEN from artikel_kostprijs where ARTIKELCODE = '"+artikelkod+"' and SOORT = '4'");
+//					
+//					ResultSet rs2 = b.executeQuery("select ARTIKELCODE, MATERIAAL,LONEN  from artikel_kostprijs_allsort\r\n" + 
+//							"where ARTIKELCODE = '"+artikelkod+"'\r\n" + 
+//							"and DATUM between '"+BeginDate+"' and '"+EndDate+"'\r\n" + 
+//							"and SOORT = '4' order by DATUM desc limit 1");
+//					
+//					if (!rs2.isBeforeFirst() ) { 
+//						
+//							Statement st1 = conn.createStatement();							
+//							ResultSet rs1 = st1.executeQuery("select ARTIKELCODE, MATERIAAL, LONEN  from artikel_kostprijs_allsort where SOORT = '4'\r\n" + 
+//									"and ARTIKELCODE = '"+artikelkod+"'\r\n" + 
+//									"order by DATUM desc limit 1 ");
+//						
+//						// if resultset is completly empty set it all to 0.0
+//							if (!rs1.isBeforeFirst() ) 
+//							{ 						
+//								ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(0.0);
+//								ListofStructuresTest.get(i).setCenaMaterialu(0.0);
+//								ListofStructuresTest.get(i).setCenaPracy(0.0);
+//							}
+//							else
+//							{
+//								while(rs1.next())
+//								{
+//									if(rs1.getString("MATERIAAL").equals("")|| rs1.getString("MATERIAAL").equals(null))
+//										ListofStructuresTest.get(i).setCenaMaterialu(0.0);
+//									
+//									else
+//										ListofStructuresTest.get(i).setCenaMaterialu(Double.parseDouble(rs1.getString("MATERIAAL")));
+//									
+//									Double cena = ListofStructuresTest.get(i).getCenaMaterialu();
+//									Double ilosc = ListofStructuresTest.get(i).getILOSC();
+//
+//									
+//									Double cenaRazyIlosc = cena * ilosc;				
+//									ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(cenaRazyIlosc);
+//									
+//									if(rs1.getString("LONEN").equals("")|| rs1.getString("LONEN").equals(null))
+//										ListofStructuresTest.get(i).setCenaPracy(0.0);	
+//								
+//									else
+//										ListofStructuresTest.get(i).setCenaPracy(Double.parseDouble(rs1.getString("LONEN")));
+//
+//									Double cenaPracySzt = ListofStructuresTest.get(i).getCenaPracy();
+//									Double pracaRazyIlosc = cenaPracySzt * ilosc;
+//									
+//									ListofStructuresTest.get(i).setCenaPracyRazyIlosc(pracaRazyIlosc);
+//									
+//									//Add to summary:
+//									CalosciowaCenaPracy += ListofStructuresTest.get(i).getCenaPracyRazyIlosc();
+//									CalosciowaCenaMaterialu += ListofStructuresTest.get(i).getCenaMaterialuRazyIlosc();
+//								}
+//							}
+//							st1.close();
+//							rs1.close();
+//						
+//					}
+//					else
+//					{
+//						while(rs2.next())
+//						{
+//							
+//						if(rs2.getString("MATERIAAL").equals("")|| rs2.getString("MATERIAAL").equals(null))
+//							ListofStructuresTest.get(i).setCenaMaterialu(0.0);
+//						
+//						else
+//							ListofStructuresTest.get(i).setCenaMaterialu(Double.parseDouble(rs2.getString("MATERIAAL")));
+//						
+//						Double cena = ListofStructuresTest.get(i).getCenaMaterialu();
+//						Double ilosc = ListofStructuresTest.get(i).getILOSC();
+//
+//						
+//						Double cenaRazyIlosc = cena * ilosc;				
+//						ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(cenaRazyIlosc);
+//						
+//						if(rs2.getString("LONEN").equals("")|| rs2.getString("LONEN").equals(null))
+//							ListofStructuresTest.get(i).setCenaPracy(0.0);	
+//					
+//						else
+//							ListofStructuresTest.get(i).setCenaPracy(Double.parseDouble(rs2.getString("LONEN")));
+//
+//						Double cenaPracySzt = ListofStructuresTest.get(i).getCenaPracy();
+//						Double pracaRazyIlosc = cenaPracySzt * ilosc;
+//						
+//						ListofStructuresTest.get(i).setCenaPracyRazyIlosc(pracaRazyIlosc);
+//						
+//						//Add to summary:
+//						CalosciowaCenaPracy += ListofStructuresTest.get(i).getCenaPracyRazyIlosc();
+//						CalosciowaCenaMaterialu += ListofStructuresTest.get(i).getCenaMaterialuRazyIlosc();
+//						}
+//					}
+//					b.close();
+//					rs2.close();			
+//			}		
+//		}
+		
+		
+private static void GetAllPrices(Connection conn) throws SQLException {
 			
 			for(int i = 0 ; i < ListofStructuresTest.size();i++)
 			{															
@@ -251,9 +410,8 @@ public class CountMaterial2test {
 		
 		public static void getListaGLownychZlozen(String art, Connection conn) throws SQLException
 		 {
-			Statement b = conn.createStatement();
-			
-			ResultSet rs2 = b.executeQuery("select ARTIKELCODE, ONDERDEEL from struktury where ARTIKELCODE like '"+art+"%' order by seq asc ");
+			Statement b = conn.createStatement();			
+			ResultSet rs2 = b.executeQuery("select ARTIKELCODE, ONDERDEEL from struktury where ARTIKELCODE like '"+art+"%' order by ARTIKELCODE asc ");
 			
 			while(rs2.next()){
 				ListaGlownychZlozenIPodzlozen.put(rs2.getString("ONDERDEEL"), rs2.getString("ARTIKELCODE"));

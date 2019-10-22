@@ -46,6 +46,8 @@ public class Main extends JFrame {
 					text = "190522";
 					
 					CountMaterial2test.run();
+					
+
 
 					
 				//	Main frame = new Main();
