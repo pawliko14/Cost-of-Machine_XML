@@ -47,7 +47,6 @@ public class GenerateDocument {
 		String dest = Parameters.getPathOfSavingAnaliza_MaszynPDF();
 		 PdfPTable table;
 		 PdfPTable table1 = null;
-		 PdfPTable table_of_main_projects = null;
 
 		System.out.println("\ngenerowanie PDf1\n");
 		// GENEROWANIE DOKUMENTU PDF
@@ -75,7 +74,7 @@ public class GenerateDocument {
                       BaseFont.CP1252,
                       BaseFont.EMBEDDED
                       );
-              Font font = new Font(bf, 16);
+              Font font = new Font(bf, 14);
   
               
 		        // header row:
@@ -154,15 +153,10 @@ public class GenerateDocument {
 		   		//Check if the primal projects occurs multipletimes, if yes add only once(when item occurred for the first time) to temporaryListofMainProjects   				
 	   				temporaryListofMainProjects.add(List.get(i).getGlownyProjekt()); // add item(main project, equvalnt of 190521 or 170700 etc) from list
 	   				if(temporaryListofMainProjects.size() >=2 && temporaryListofMainProjects.get(temporaryListofMainProjects.size()-2).equals(List.get(i).getGlownyProjekt()))
-	   				{
-	   		//			System.out.println("temporaryListofMainProjects val last el: " + temporaryListofMainProjects.get(temporaryListofMainProjects.size()-2) + "  Normal list [i] element: " +  List.get(i).getGlownyProjekt());
-	   					
+	   				{	   					
 	   				 c1 += roznica*(List.get(i).getPoziom()+ 1);
 		   			 c2 += roznica*(List.get(i).getPoziom()+ 1);
-		   			 c3 += roznica*(List.get(i).getPoziom()+ 1);	
-		   			
-
-	   					
+		   			 c3 += roznica*(List.get(i).getPoziom()+ 1);			   			   					
 	   				}
 	   				else
 	   				{
@@ -219,9 +213,7 @@ public class GenerateDocument {
 		    		  
 		   			}
 		   			else
-		   			{		   			
-				   			
-		   				
+		   			{		   				   				
 				   			
 				   				// jesli jest poziom 0 to tez znajdzie sie projekt nadrzedny
 				   			PdfPTable table0;
@@ -241,7 +233,8 @@ public class GenerateDocument {
 		   		   	  	table_cell01.setBackgroundColor(new BaseColor(c1, c2, c3));
 		   		   	  	table0.addCell(table_cell01);
 						
-						PdfPCell table_cell02 = new PdfPCell(new Phrase(GetCfomsendreel(conn,Maszynka,List.get(i).getARTIKELCODE()),font));
+						PdfPCell table_cell02 = new PdfPCell(new Phrase(GetCfomsendreel(conn,List.get(i).getGlownyProjekt(),List.get(i).getARTIKELCODE()),font));
+		   		   	 // 	PdfPCell table_cell02 = new PdfPCell(new Phrase(List.get(i).getCFOMSONDERDEEL(),font));
 		   		   	  	table_cell02.setHorizontalAlignment(Element.ALIGN_CENTER);
 		   		   	  	table_cell02.setBackgroundColor(new BaseColor(c1, c2, c3));
 						table0.addCell(table_cell02);
@@ -256,27 +249,64 @@ public class GenerateDocument {
 						table_cell04.setBackgroundColor(new BaseColor(c1, c2, c3));
 						table0.addCell(table_cell04);
 						
-						PdfPCell table_cell05 = new PdfPCell(new Phrase("--",font));
-						table_cell05.setBackgroundColor(new BaseColor(c1, c2, c3));
-		   		   	  	table_cell05.setHorizontalAlignment(Element.ALIGN_CENTER);
-						table0.addCell(table_cell05);
-						
-						PdfPCell table_cell06 = new PdfPCell(new Phrase("--",font));
-						table_cell06.setBackgroundColor(new BaseColor(c1, c2, c3));
-		   		   	  	table_cell06.setHorizontalAlignment(Element.ALIGN_CENTER);
-						table0.addCell(table_cell06);
-						
-						PdfPCell table_cell07 = new PdfPCell(new Phrase("--",font));
-						table_cell07.setBackgroundColor(new BaseColor(c1, c2, c3));
-		   		   	  	table_cell07.setHorizontalAlignment(Element.ALIGN_CENTER);
-						table0.addCell(table_cell07);
-						
-						PdfPCell table_cell08 = new PdfPCell(new Phrase("--",font));
-						table_cell08.setBackgroundColor(new BaseColor(c1, c2, c3));
-		   		   	  	table_cell08.setHorizontalAlignment(Element.ALIGN_CENTER);
-						table0.addCell(table_cell08);
-						
-						PdfPCell table_cell09 = new PdfPCell(new Phrase("--"));
+						if(List.get(i).getCenaMaterialu().equals(" ") || List.get(i).getCenaMaterialu().equals(null))
+						{
+							PdfPCell table_cell05 = new PdfPCell(new Phrase("--",font));
+							table_cell05.setBackgroundColor(new BaseColor(c1, c2, c3));
+			   		   	  	table_cell05.setHorizontalAlignment(Element.ALIGN_CENTER);
+							table0.addCell(table_cell05);
+						}
+						else
+						{
+							PdfPCell table_cell05 = new PdfPCell(new Phrase(decForm.format(List.get(i).getCenaMaterialu()),font));
+							table_cell05.setBackgroundColor(new BaseColor(c1, c2, c3));
+			   		   	  	table_cell05.setHorizontalAlignment(Element.ALIGN_CENTER);
+							table0.addCell(table_cell05);
+						}
+				
+						if(List.get(i).getCenaMaterialuRazyIlosc().equals(" ") || List.get(i).getCenaMaterialuRazyIlosc().equals(null))
+						{
+							PdfPCell table_cell06 = new PdfPCell(new Phrase("--",font));
+							table_cell06.setBackgroundColor(new BaseColor(c1, c2, c3));
+			   		   	  	table_cell06.setHorizontalAlignment(Element.ALIGN_CENTER);
+							table0.addCell(table_cell06);
+						}
+						else
+						{
+							PdfPCell table_cell06 = new PdfPCell(new Phrase(decForm.format(List.get(i).getCenaMaterialuRazyIlosc()),font));
+							table_cell06.setBackgroundColor(new BaseColor(c1, c2, c3));
+			   		   	  	table_cell06.setHorizontalAlignment(Element.ALIGN_CENTER);
+							table0.addCell(table_cell06);
+						}
+						if(List.get(i).getCenaPracy().equals(" ") || List.get(i).getCenaPracy().equals(null))
+						{
+							PdfPCell table_cell07 = new PdfPCell(new Phrase("--",font));
+							table_cell07.setBackgroundColor(new BaseColor(c1, c2, c3));
+			   		   	  	table_cell07.setHorizontalAlignment(Element.ALIGN_CENTER);
+							table0.addCell(table_cell07);
+						}
+						else
+						{
+							PdfPCell table_cell07 = new PdfPCell(new Phrase(decForm.format(List.get(i).getCenaPracy()),font));
+							table_cell07.setBackgroundColor(new BaseColor(c1, c2, c3));
+			   		   	  	table_cell07.setHorizontalAlignment(Element.ALIGN_CENTER);
+							table0.addCell(table_cell07);
+						}
+						if(List.get(i).getCenaPracyRazyIlosc() == null || List.get(i).getCenaPracyRazyIlosc().equals(null))
+						{
+							PdfPCell table_cell08 = new PdfPCell(new Phrase("--",font));
+							table_cell08.setBackgroundColor(new BaseColor(c1, c2, c3));
+			   		   	  	table_cell08.setHorizontalAlignment(Element.ALIGN_CENTER);
+							table0.addCell(table_cell08);
+						}
+						else
+						{							
+							PdfPCell table_cell08 =  new PdfPCell(new Phrase(decForm.format(List.get(i).getCenaPracyRazyIlosc()),font));;
+							table_cell08.setBackgroundColor(new BaseColor(c1, c2, c3));
+			   		   	  	table_cell08.setHorizontalAlignment(Element.ALIGN_CENTER);
+							table0.addCell(table_cell08);
+						}
+						PdfPCell table_cell09 = new PdfPCell(new Phrase(List.get(i).getTYP()));
 						table_cell09.setBackgroundColor(new BaseColor(c1, c2, c3));
 		   		   	  	table_cell09.setHorizontalAlignment(Element.ALIGN_CENTER);
 						table0.addCell(table_cell09);
@@ -410,39 +440,47 @@ public class GenerateDocument {
 		   		table1.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		   		
 				PdfPCell table_cell10 = new PdfPCell(new Phrase(List.get(i).getPoziom().toString(),font));
+				table_cell10.setHorizontalAlignment(Element.ALIGN_CENTER);
 				table_cell10.setBackgroundColor(new BaseColor(c1, c2, c3)); 
 				table1.addCell(table_cell10);
 		   		
 				PdfPCell table_cell12 = new PdfPCell(new Phrase(List.get(i).getONDERDEEL(),font));
+				table_cell12.setHorizontalAlignment(Element.ALIGN_CENTER);
 				table_cell12.setBackgroundColor(new BaseColor(c1, c2, c3)); 
 				table1.addCell(table_cell12);
 		      	    		
 	    		PdfPCell table_cell22 = new PdfPCell(new Phrase(List.get(i).getCFOMSONDERDEEL(),font));
+	    		table_cell22.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    		table_cell22.setBackgroundColor(new BaseColor(c1, c2, c3));
 	    		table1.addCell(table_cell22);
 	    		
 	    		PdfPCell table_cell32 = new PdfPCell(new Phrase(List.get(i).getILOSC().toString(),font));
+	    		table_cell32.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    		table_cell32.setBackgroundColor(new BaseColor(c1, c2, c3));
 	    		table1.addCell(table_cell32);
 	    		
 	    		PdfPCell table_cell42 = new PdfPCell(new Phrase(List.get(i).getJEDNOSTKA(),font));
+	    		table_cell42.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    		table_cell42.setBackgroundColor(new BaseColor(c1, c2, c3));
 	    		table1.addCell(table_cell42);
 	    		
 	    		if(List.get(i).getCenaMaterialu().equals(null) || List.get(i).getCenaMaterialu()==0 || List.get(i).getCenaMaterialu()== null)
 	    		{
 	    			PdfPCell table_cell52 = new PdfPCell(new Phrase("NULL",font));
+	    			table_cell52.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    			table_cell52.setBackgroundColor(new BaseColor(c1, c2, c3));
 		    		table1.addCell(table_cell52);
 	    		}
 	    		else {
 		    		PdfPCell table_cell52 = new PdfPCell(new Phrase(decForm.format(List.get(i).getCenaMaterialu()),font));
+		    		table_cell52.setHorizontalAlignment(Element.ALIGN_CENTER);
 		    		table_cell52.setBackgroundColor(new BaseColor(c1, c2, c3));
 		    		table1.addCell(table_cell52);
 	    		}
 	    		
 	    		
 	    		PdfPCell table_cell62 = new PdfPCell(new Phrase(decForm.format(List.get(i).getCenaMaterialuRazyIlosc()),font));
+	    		table_cell62.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    		table_cell62.setBackgroundColor(new BaseColor(c1, c2, c3));
 	    		table1.addCell(table_cell62);
 	    		
@@ -450,28 +488,33 @@ public class GenerateDocument {
 	    		if(List.get(i).getCenaMaterialu().equals(null) || List.get(i).getCenaPracy()==0 || List.get(i).getCenaMaterialu()== null)
 	    		{		    		
 		    		PdfPCell table_cell72 = new PdfPCell(new Phrase("NULL",font));
+		    		table_cell72.setHorizontalAlignment(Element.ALIGN_CENTER);
 		    		table_cell72.setBackgroundColor(new BaseColor(c1, c2, c3));
 		    		table1.addCell(table_cell72);
 	    		}
 	    		else
 	    		{
 	    			PdfPCell table_cell72 = new PdfPCell(new Phrase(decForm.format(List.get(i).getCenaPracy()),font));
+	    			table_cell72.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    			table_cell72.setBackgroundColor(new BaseColor(c1, c2, c3));
 		    		table1.addCell(table_cell72);
 	    		}
 	    		if(List.get(i).getCenaMaterialu().equals(null) || List.get(i).getCenaPracy()==0 || List.get(i).getCenaMaterialu()== null)
 	    		{
 		    		PdfPCell table_cell82 = new PdfPCell(new Phrase("NULL",font));
+		    		table_cell82.setHorizontalAlignment(Element.ALIGN_CENTER);
 		    		table_cell82.setBackgroundColor(new BaseColor(c1, c2, c3));
 		    		table1.addCell(table_cell82);
 	    		}
 	    		else
 	    		{
 	    	 		PdfPCell table_cell82 = new PdfPCell(new Phrase(decForm.format(List.get(i).getCenaPracyRazyIlosc()),font));
-		    		table_cell82.setBackgroundColor(new BaseColor(c1, c2, c3));
+	    	 		table_cell82.setHorizontalAlignment(Element.ALIGN_CENTER);
+	    	 		table_cell82.setBackgroundColor(new BaseColor(c1, c2, c3));
 		    		table1.addCell(table_cell82);
 	    		}
 	    		PdfPCell table_cell92 = new PdfPCell(new Phrase(List.get(i).getTYP(),font));
+	    		table_cell92.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    		table_cell92.setBackgroundColor(new BaseColor(c1, c2, c3));
 	    		table1.addCell(table_cell92);
 	        
@@ -483,22 +526,10 @@ public class GenerateDocument {
 	
 	}
 	
-	//problem, function do not rewrite existing variable
-	public static void GetFontBackgroundColor(int c1, int c2, int c3, int f1,int f2, int f3,int index, int Diff_font, int Diff_Background,ArrayList<Struktury> List)
-	{
-			 c1 += Diff_Background*(List.get(index).getPoziom()+ 1);
-			 c2 += Diff_Background*(List.get(index).getPoziom()+ 1);
-			 c3 += Diff_Background*(List.get(index).getPoziom()+ 1);
-			 
-			 f1 -= Diff_font*(List.get(index).getPoziom()+ 1);
-			 f2 -= Diff_font*(List.get(index).getPoziom()+ 1);
-			 f3 -= Diff_font*(List.get(index).getPoziom()+ 1);
-	}
-	
 	public static String GetCfomsendreel(Connection conn,String artikel, String Onderdeel) throws SQLException
 	{
 		String ss = "";		
-		String sql = "select * from struktury where ARTIKELCODE = '"+artikel+"' and ONDERDEEL = '"+Onderdeel+"' order by seq";
+		String sql = "select CFOMSONDERDEEL from struktury where ARTIKELCODE = '"+artikel+"' and ONDERDEEL = '"+Onderdeel+"' order by seq";
 	
 		Statement e = conn.createStatement();
 		try {
@@ -510,8 +541,7 @@ public class GenerateDocument {
 		ResultSet rs = e.executeQuery(sql);
 		while(rs.next()) {
 			ss= rs.getString("CFOMSONDERDEEL");
-		}
-		
+		}		
 		rs.close();
 		e.close();
 								

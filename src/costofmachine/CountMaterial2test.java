@@ -40,8 +40,8 @@ public class CountMaterial2test {
 	// static String Maszynka ="190521";
 	// static String Maszynka = "170700";
 	// static String Maszynka ="190522"; // jakis problem brakuje kolejnosci jak w poprzednich przykladach
-	 static String Maszynka ="190555";
-
+	// static String Maszynka ="170506"; // duza ilosc podprojektow, problem z podprojektem 17050602, brakuje czesci rzeczy ze zlozenia, wyladowaly w innym zlozeniu
+	 static String Maszynka = "170801";
 
 	 
 	 static String GlownyProjektDlaArtykulu = "";
