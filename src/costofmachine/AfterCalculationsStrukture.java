@@ -2,12 +2,18 @@ package costofmachine;
 
 public class AfterCalculationsStrukture {
 	
+	
+	
+	
+	
+	
 	private String Leverancier;
 	private String ORDERNUMMER;
 	private String SEQUENTIE;
 	private String ARTIKELCODE;
 	private String ARTIKELOMSCHRIJVING;
 	private String BESTELD;
+	private String BESTELDATUM;
 	private String GELEVERD;
 	private String PROJECTNUMMER;
 	private String LEVERDATUM;
@@ -20,6 +26,12 @@ public class AfterCalculationsStrukture {
 	
 	
 	
+	public String getBESTELDATUM() {
+		return BESTELDATUM;
+	}
+	public void setBESTELDATUM(String bESTELDATUM) {
+		BESTELDATUM = bESTELDATUM;
+	}
 	public String getMONTAGEOMSCHRIJVING() {
 		return MONTAGEOMSCHRIJVING;
 	}
@@ -113,7 +125,7 @@ public class AfterCalculationsStrukture {
 
 
 	
-	public void getAllData()
+	public void PrintAllData()
 	{
 		System.out.println("Obiekt: ");
 		System.out.println("Leverancier: " + this.getLeverancier());

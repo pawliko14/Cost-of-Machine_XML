@@ -37,28 +37,24 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class CountMaterial2test {
 	 static String MASZYNA = Main.text; // na sztywno, potem mozliwosc zmiany w gui
-	// static String Maszynka ="190521";
+	 static String Maszynka ="190521";
 	// static String Maszynka = "170700";
 	// static String Maszynka ="190522"; // jakis problem brakuje kolejnosci jak w poprzednich przykladach
 	// static String Maszynka ="170506"; // duza ilosc podprojektow, problem z podprojektem 17050602, brakuje czesci rzeczy ze zlozenia, wyladowaly w innym zlozeniu
-	 static String Maszynka = "170801";
+	// static String Maszynka = "170801";
+	// static String Maszynka = "180564";  // 10 podprojektow 02 -> 12 , kolejnosc w miare sie zgadza, brak duzej czesci danych o kosztach artykulow(zwlaszcza gdzie dostawca jest SACA(1190031) 
 
 	 
 	 static String GlownyProjektDlaArtykulu = "";
-	 
 	 private static Map<String,String> ListaGlownychZlozenIPodzlozen;
-
 	 //testowa struktura, na potrzeby programu Asi
 	 private static ArrayList<Struktury>ListofStructuresTest;
-	 private static int iloscZaglebien = 0;
-	 
+	 private static int iloscZaglebien = 0; 
 	 private static Double CalosciowaCenaPracy = 0.0;
 	 private static Double CalosciowaCenaKonstrukcja = 0.0;
 	 private static Double CalosciowaCenaProgramisciCNC = 0.0;
 	 private static Double CalosciowaCenaElektronicy = 0.0;
-
-	 private static Double CalosciowaCenaMaterialu = 0.0;
-	 
+	 private static Double CalosciowaCenaMaterialu = 0.0; 
 	 private static int CenaPracoGodziny = 120; // kiedys, dowiedziec sie kiedy cena pracy to bylo 100zl, aktualnie jest 120zl
 	 
 	 
@@ -66,68 +62,70 @@ public class CountMaterial2test {
 			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
 			
 			
-			try {
-				
-							
-					
-					 ListofStructuresTest = new ArrayList<Struktury>();				 			 
-					 
-					 ListaGlownychZlozenIPodzlozen = new LinkedHashMap<String,String>(); // LinkedHashMap - preserver the insertion order, have to used Linked one
-					 getListaGLownychZlozen(Maszynka,conn);
-					 
-						
-
-					
-					 		//remove not working structure
-//						for(int i = 0 ; i < ListaGlownychZlozen.size();i++)
-//							if(ListaGlownychZlozen.get(i).equals("%%360A-030-4000/000"))
-//								ListaGlownychZlozen.remove(i);
-							
-										Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
-										int it = 0;
-										for(Entry<String, String> entry: entrySet) {
-											GlownyProjektDlaArtykulu = entry.getValue();
-											System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
-											GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);		
-											iloscZaglebien= 0; // reset deppth of the structure
-											it++;
-										}					
-						
-									GetAllPrices(conn);									
-									ShowAll();
-	 							 
-			}
-			catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			PodsumowanieKoncowe();
-			GetCenaKonstrukcja_CNC_Elektronicy(conn);			
-			Podsumowanie();
-			
-			
-			// generowanie dokumentu
-			GenerateDocument dokumencik = new GenerateDocument();
-			dokumencik.Generate(ListofStructuresTest, conn, Maszynka);
-					
+//			try {
+//				
+//							
+//					
+//					 ListofStructuresTest = new ArrayList<Struktury>();				 			 			 
+//					 ListaGlownychZlozenIPodzlozen = new LinkedHashMap<String,String>(); // LinkedHashMap - preserver the insertion order, have to used Linked one
+//					 getListaGLownychZlozen(Maszynka,conn);
+//					 
+//						
+//
+//					
+//					 		//remove not working structure
+////						for(int i = 0 ; i < ListaGlownychZlozen.size();i++)
+////							if(ListaGlownychZlozen.get(i).equals("%%360A-030-4000/000"))
+////								ListaGlownychZlozen.remove(i);
+//							
+//										Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
+//										int it = 0;
+//										for(Entry<String, String> entry: entrySet) {
+//											GlownyProjektDlaArtykulu = entry.getValue();
+//											System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
+//											GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);		
+//											iloscZaglebien= 0; // reset deppth of the structure
+//											it++;
+//										}					
+//						
+//									GetAllPrices(conn);									
+//									ShowAll();
+//	 							 
+//			}
+//			catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			PodsumowanieKoncowe();
+//			GetCenaKonstrukcja_CNC_Elektronicy(conn);			
+//			Podsumowanie();
+//			
+//			
+//			// generowanie dokumentu
+//			GenerateDocumentStruktury dokument_Struktury = new GenerateDocumentStruktury();
+//			dokument_Struktury.Generate(ListofStructuresTest, conn, Maszynka);
+//					
 			
 			
 			// ---------------------------------------------------------------
 			// sprawdzenie afterkalkulacji -> czyli kalkulacji koncowej(storenotesdetail)
 			// ---------------------------------------------------------------
 
-//			GetDataFromAftercalculations AfterCalculationsObiekt = new GetDataFromAftercalculations();
-//			
-//			AfterCalculationsObiekt.GetWholeData_from_storenotesDetail(conn, Maszynka);
-//			AfterCalculationsObiekt.GetWholeData_from_receptie(conn, Maszynka);
-//				
-//			ArrayList<AfterCalculationsStrukture> tescik = AfterCalculationsObiekt.PrzekazObiekt();
-//			
-//			AfterCalculationsObiekt.ShowAllInList(tescik);		
-//			AfterCalculationsObiekt.PrintTofile(tescik);
-//			
+			GetDataFromAftercalculations AfterCalculationsObiekt = new GetDataFromAftercalculations();
 			
+			AfterCalculationsObiekt.GetWholeData_from_storenotesDetail(conn, Maszynka);
+			AfterCalculationsObiekt.GetWholeData_from_receptie(conn, Maszynka);
+				
+			ArrayList<AfterCalculationsStrukture> tescik = AfterCalculationsObiekt.PrzekazObiekt();
+			
+			AfterCalculationsObiekt.ShowAllInList(tescik);		
+			AfterCalculationsObiekt.PrintTofile(tescik);
+			
+		// generowanie dokumentu
+		GenerateDocumentKalkulacjaKoncowa dokument_kalkulacja = new GenerateDocumentKalkulacjaKoncowa();
+		dokument_kalkulacja.Generate(tescik, conn, Maszynka);
+		
 			
 			System.out.println("done");
 	}

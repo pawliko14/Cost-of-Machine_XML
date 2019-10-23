@@ -94,7 +94,7 @@ public class GetDataFromAftercalculations {
 		ResultSet rs = s.executeQuery("select Leverancier,ORDERNUMMER,SEQUENTIE,ARTIKELCODE,ARTIKELOMSCHRIJVING,BESTELD,GELEVERD,\r\n" + 
 				"PROJECTNUMMER,BESTELDATUM,LEVERDATUM,LEVERINGSDATUMEFFECTIEF,LEVERINGSDATUMINGAVERECEPTIE,\r\n" + 
 				"EENHEIDSPRIJS,MUNT,TOTAAL,concat(MONTAGE,'-', MONTAGEOMSCHRIJVING) as MONT \r\n" + 
-				"from storenotesdetail where PROJECTNUMMER = '"+project+"' and GELEVERD >=1 order by ORDERNUMMER,SEQUENTIE asc "); // check if element was delivered, only deliverd ones interss us
+				"from storenotesdetail where PROJECTNUMMER like '"+project+"%' and GELEVERD >=1 AND MONTAGEOMSCHRIJVING IS NOT NULL order by ORDERNUMMER,SEQUENTIE asc "); // check if element was delivered, only deliverd ones interss us
 		while(rs.next()) {
 			AfterCalculationsStrukture obiekt = new AfterCalculationsStrukture();
 			
@@ -123,7 +123,7 @@ public class GetDataFromAftercalculations {
 			obiekt.setBESTELD(BESTELD);
 			obiekt.setGELEVERD(GELEVERD);
 			obiekt.setPROJECTNUMMER(PROJECTNUMMER);
-			obiekt.setBESTELD(BESTELDATUM);
+			obiekt.setBESTELDATUM(BESTELDATUM);
 			obiekt.setLEVERDATUM(LEVERDATUM);
 			obiekt.setLEVERINGSDATUMEFFECTIEF(LEVERINGSDATUMEFFECTIEF);
 			obiekt.setLEVERINGSDATUMINGAVERECEPTIE(LEVERINGSDATUMINGAVERECEPTIE);
@@ -150,6 +150,7 @@ public class GetDataFromAftercalculations {
 			{
 				out.println("Obiekt: [" + i +"] ");
 				out.println("Leverancier: " + tescik.get(i).getLeverancier());
+				out.println("ORDERNUMMER: " + tescik.get(i).getORDERNUMMER());
 				out.println("SEQUENTIE: " + tescik.get(i).getSEQUENTIE());
 				out.println("ARTIKELCODE: " + tescik.get(i).getARTIKELCODE());
 				out.println("ARTIKELOMSCHRIJVING: " + tescik.get(i).getARTIKELOMSCHRIJVING());
@@ -175,7 +176,7 @@ public class GetDataFromAftercalculations {
 	{
 		for(int i = 0 ; i <tescik.size();i++)
 		{
-			tescik.get(i).getAllData();
+			tescik.get(i).PrintAllData();
 		}
 	}
 

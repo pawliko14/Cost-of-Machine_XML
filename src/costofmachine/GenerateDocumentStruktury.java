@@ -28,13 +28,13 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-public class GenerateDocument {
+public class GenerateDocumentStruktury {
 	
 	 private static DecimalFormat decForm = new DecimalFormat("#.###");
 	 private static ArrayList<String> temporaryList;	 
 	 private static ArrayList<String> temporaryListofMainProjects;
 	
-	GenerateDocument()
+	GenerateDocumentStruktury()
 	{
 		
 	}
@@ -125,7 +125,7 @@ public class GenerateDocument {
 
 		   for(int i = 0 ; i <List.size() ; i++)
 		   {
-			   // change font color depending on interation of deepth
+			   // change font color depending on iteration of deepth
 			   
 			   int f1 = 0;
 			   int f2 = 0;
