@@ -62,41 +62,41 @@ public class CountMaterial2test {
 			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
 			
 			
-//			try {
-//				
-//							
-//					
-//					 ListofStructuresTest = new ArrayList<Struktury>();				 			 			 
-//					 ListaGlownychZlozenIPodzlozen = new LinkedHashMap<String,String>(); // LinkedHashMap - preserver the insertion order, have to used Linked one
-//					 getListaGLownychZlozen(Maszynka,conn);
-//					 
-//						
-//
-//					
-//					 		//remove not working structure
-////						for(int i = 0 ; i < ListaGlownychZlozen.size();i++)
-////							if(ListaGlownychZlozen.get(i).equals("%%360A-030-4000/000"))
-////								ListaGlownychZlozen.remove(i);
-//							
-//										Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
-//										int it = 0;
-//										for(Entry<String, String> entry: entrySet) {
-//											GlownyProjektDlaArtykulu = entry.getValue();
-//											System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
-//											GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);		
-//											iloscZaglebien= 0; // reset deppth of the structure
-//											it++;
-//										}					
-//						
-//									GetAllPrices(conn);									
-//									ShowAll();
-//	 							 
-//			}
-//			catch (SQLException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
+			try {
+				
+							
+					
+					 ListofStructuresTest = new ArrayList<Struktury>();				 			 			 
+					 ListaGlownychZlozenIPodzlozen = new LinkedHashMap<String,String>(); // LinkedHashMap - preserver the insertion order, have to used Linked one
+					 getListaGLownychZlozen(Maszynka,conn);
+					 
+						
+
+					
+					 		//remove not working structure
+//						for(int i = 0 ; i < ListaGlownychZlozen.size();i++)
+//							if(ListaGlownychZlozen.get(i).equals("%%360A-030-4000/000"))
+//								ListaGlownychZlozen.remove(i);
+							
+										Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
+										int it = 0;
+										for(Entry<String, String> entry: entrySet) {
+											GlownyProjektDlaArtykulu = entry.getValue();
+											System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
+											GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);		
+											iloscZaglebien= 0; // reset deppth of the structure
+											it++;
+										}					
+						
+									GetAllPrices(conn);									
+									ShowAll();
+	 							 
+			}
+			catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 //			PodsumowanieKoncowe();
 //			GetCenaKonstrukcja_CNC_Elektronicy(conn);			
 //			Podsumowanie();
@@ -105,7 +105,7 @@ public class CountMaterial2test {
 //			// generowanie dokumentu
 //			GenerateDocumentStruktury dokument_Struktury = new GenerateDocumentStruktury();
 //			dokument_Struktury.Generate(ListofStructuresTest, conn, Maszynka);
-//					
+					
 			
 			
 			// ---------------------------------------------------------------
@@ -124,8 +124,10 @@ public class CountMaterial2test {
 			
 		// generowanie dokumentu
 		GenerateDocumentKalkulacjaKoncowa dokument_kalkulacja = new GenerateDocumentKalkulacjaKoncowa();
-		dokument_kalkulacja.Generate(tescik, conn, Maszynka);
 		
+		//dokument_kalkulacja.Generate(tescik, conn, Maszynka); // first version, without passing main array
+			dokument_kalkulacja.Generate_v2(tescik, conn, Maszynka,ListofStructuresTest);
+
 			
 			System.out.println("done");
 	}

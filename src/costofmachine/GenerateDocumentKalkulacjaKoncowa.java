@@ -29,7 +29,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 public class GenerateDocumentKalkulacjaKoncowa {
 
 	
-//	 private static DecimalFormat decForm = new DecimalFormat("#.###");
+	 private static DecimalFormat decForm = new DecimalFormat("#.###");
 //	 private static ArrayList<String> temporaryList;	 
 //	 private static ArrayList<String> temporaryListofMainProjects;
 	
@@ -240,7 +240,8 @@ public class GenerateDocumentKalkulacjaKoncowa {
 		   			 * 
 		   			 */
 		   			
-		   			
+		   		
+		   		//if(tecik.get(i).get)
 		   			
 		   			
 		   			
@@ -747,6 +748,330 @@ public class GenerateDocumentKalkulacjaKoncowa {
 		return ss;				
 	}
 
+	
+	
+	
+	public void Generate_v2(ArrayList<AfterCalculationsStrukture> tescik, Connection conn, String Maszynka ,ArrayList<Struktury>Lista_ze_struktur) throws DocumentException, SQLException, IOException
+	{
+		temporaryListofMainProjects = new ArrayList<String>();
+
+		
+		
+		System.out.println("search for existing getter methods in object:");
+		Method[] methodstemporary = tescik.get(0).getClass().getMethods();	// take first element, it does not matter
+		List<String> ListOfMethods = new ArrayList<String>();
+		for(Method m : methodstemporary)
+		{
+			if(m.getName().startsWith("get") && m.getParameterTypes().length == 0 && !m.getName().equals("getClass")) {
+				ListOfMethods.add(m.getName());
+			}
+		}
+		for(int i = 0 ; i< ListOfMethods.size();i++)
+		{
+			System.out.println("method :" + i + "  -> " + ListOfMethods.get(i));
+		}
+		
+		
+		//Font fontH1 = new Font(Currier, 16, Font.NORMAL);
+
+
+		 String dest = Parameters.getPathOfSavingAnaliza_Maszyn_kalkulacjaKoncowaPDF();
+		 PdfPTable table = null;
+		 PdfPTable table1 = null;
+
+		System.out.println("\ngenerowanie PDf1\n");
+		// GENEROWANIE DOKUMENTU PDF
+	    Document document = new Document(PageSize.A1.rotate());
+        PdfWriter.getInstance(document, new FileOutputStream(dest));
+       
+       
+     //  temporaryList = new ArrayList<String>();
+    //   temporaryListofMainProjects= new ArrayList<String>();
+       
+           document.open();
+
+		   document.add(new Paragraph("Data wygenerowania raportu: "+new Date().toString()));
+		   document.add(new Paragraph("\n\n"));
+       
+		   
+		   
+		   	table = new PdfPTable(new float[] {110,110,110,210,210,110,110,110,110,110,110,110,110,110});
+		   	table.setTotalWidth(1740);
+		   	table.setLockedWidth(true);
+		//	  table.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+   		  BaseFont bf = BaseFont.createFont(
+                     BaseFont.TIMES_ROMAN,
+                     BaseFont.CP1252,
+                     BaseFont.EMBEDDED
+                     );
+             Font font = new Font(bf, 14);
+ 
+             
+             
+             
+             
+		        // header row:
+		        table.addCell(new PdfPCell(new Phrase("DOSTAWCA",font)));
+		        table.addCell(new PdfPCell(new Phrase("NUMER ZAMOWIENIA",font)));
+		        table.addCell(new PdfPCell(new Phrase("SEKWENCJA ZAMOWIENIA",font)));
+		        table.addCell(new PdfPCell(new Phrase("KOD ARTYKULU",font)));		       
+		        table.addCell(new PdfPCell(new Phrase("OPIS ARTYKULU",font)));
+		        table.addCell(new PdfPCell(new Phrase("ZAMOWIONYCH",font)));
+		        table.addCell(new PdfPCell(new Phrase("DOSTARCZONYCH",font)));
+		        table.addCell(new PdfPCell(new Phrase("DATA ZAMOWIENIA",font)));
+		        table.addCell(new PdfPCell(new Phrase("DATA DOSTARCZENIA",font)));
+		        table.addCell(new PdfPCell(new Phrase("DATA DOSTARCZENIA RZECZ",font)));
+		        table.addCell(new PdfPCell(new Phrase("DATA ZAKSIEGOANIA",font)));
+		        table.addCell(new PdfPCell(new Phrase("CENA JEDNOSTKOWA",font)));
+		        table.addCell(new PdfPCell(new Phrase("WALUTA",font)));
+		        table.addCell(new PdfPCell(new Phrase("CENA JEDNOSTKOWA * ILOSC",font)));
+
+
+		        
+		       // table.setHeaderRows(1);
+		        
+		        
+		        PdfPCell table_cell1 = new PdfPCell(new Phrase("1",font));
+				table.addCell(table_cell1);
+				
+				PdfPCell table_cell2 = new PdfPCell(new Phrase(" ",font));
+				table.addCell(table_cell2);
+				
+				PdfPCell table_cell3 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell3);
+				
+				PdfPCell table_cell4 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell4);
+				
+				PdfPCell table_cell5 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell5);
+				
+				PdfPCell table_cell6 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell6);
+				
+				PdfPCell table_cell7 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell7);
+				
+				PdfPCell table_cell8 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell8);
+				
+				PdfPCell table_cell10 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell10);
+				
+				PdfPCell table_cel11 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cel11);
+				
+				PdfPCell table_cell12 = new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell12);
+				
+				PdfPCell table_cell13= new PdfPCell(new Phrase("",font));
+				table.addCell(table_cell13);
+				
+				PdfPCell table_cell14= new PdfPCell(new Phrase(""));
+				table.addCell(table_cell14);
+				
+	
+		      	    		
+		        document.add(table);
+		        
+		   //       table1 = new PdfPTable(new float[] {30,550,400,85,85,85,85,85,85,40});
+		        float[] tab = {110,110,110,210,210,110,110,110,110,110,110,110,110,110};
+			   	table1 = new PdfPTable(tab);
+			   	table1.setTotalWidth(1740);
+			   	table1.setLockedWidth(true);
+		        
+			   			   	
+			   	
+			
+	   	for(int i = 0 ; i < tescik.size();i++)
+		  	{
+			   		temporaryListofMainProjects.add(tescik.get(i).getMONTAGEOMSCHRIJVING()); // dodaje najwyzsze zlozenie do listy,
+		   			
+		   		if(!tescik.get(i).getMONTAGEOMSCHRIJVING().isEmpty() || !tescik.get(i).getMONTAGEOMSCHRIJVING().equals(null) || !tescik.get(i).getMONTAGEOMSCHRIJVING().equals(""))
+		   		{
+		   				
+		   			
+		   			if(temporaryListofMainProjects.size() >=2 && temporaryListofMainProjects.get(temporaryListofMainProjects.size()-2).equals(tescik.get(i).getMONTAGEOMSCHRIJVING()))
+	   				{	   	
+		   		//		System.out.println("test, iter: +"+ i +" ->"+ tescik.get(i).getMONTAGEOMSCHRIJVING() + " artykul : -> "+ tescik.get(i).getARTIKELCODE());
+		   				int xyz = 1;
+//	   				 c1 += roznica*(List.get(i).getPoziom()+ 1);
+//		   			 c2 += roznica*(List.get(i).getPoziom()+ 1);
+//		   			 c3 += roznica*(List.get(i).getPoziom()+ 1);			   			   					
+	   				}
+	   				else
+	   				{
+	   	              Font font_main_project = new Font(bf, 23);
+
+	   	           int   f12 = 0;
+	   	           int   f22 = 0;
+	   	           int   f32 = 0;
+	   	     
+	   				 font_main_project.setColor(f12,f22,f32);    
+	   					
+		   				// jesli jest poziom 0 to tez znajdzie sie projekt nadrzedny
+	   		            
+	   				   document.add(new Paragraph("\n\n"));
+
+		   			PdfPTable table00;
+		   			table00 = new PdfPTable(new float[] {1840});
+		   			table00.setTotalWidth(1840);
+		   			table00.setLockedWidth(true);
+		   			table00.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+		   			
+		   		 PdfPCell cell00 = new PdfPCell(new Phrase("PROCES MONTAZOWY  "+ tescik.get(i).getMONTAGEOMSCHRIJVING(),font_main_project));
+		   	//	 table_cell0000.setBackgroundColor(new BaseColor(c1, c2, c3)); 
+		   		 cell00.setHorizontalAlignment(Element.ALIGN_CENTER);
+		   		 table00.addCell(cell00);
+		   			
+				
+	   			
+				document.add(table00);
+		   			
+				
+//				 c1 += roznica*(List.get(i).getPoziom()+ 1);
+//	   			 c2 += roznica*(List.get(i).getPoziom()+ 1);
+//	   			 c3 += roznica*(List.get(i).getPoziom()+ 1);
+				
+				   	table1 = new PdfPTable(tab);
+				   	table1.setTotalWidth(1740);
+				   	table1.setLockedWidth(true);
+	   				}	
+		   		}
+		   				   		
+					PdfPCell cell01 = new PdfPCell(new Phrase(tescik.get(i).getLeverancier().toString(),font));
+					cell01.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell01);
+					
+					PdfPCell cell02 = new PdfPCell(new Phrase(tescik.get(i).getORDERNUMMER().toString(),font));
+					cell02.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell02);
+					
+					PdfPCell cell03 = new PdfPCell(new Phrase(tescik.get(i).getSEQUENTIE().toString(),font));
+					cell03.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell03);
+					
+					PdfPCell cell04 = new PdfPCell(new Phrase(tescik.get(i).getARTIKELCODE().toString(),font));
+					cell04.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell04);
+					
+					PdfPCell cell05 = new PdfPCell(new Phrase(tescik.get(i).getARTIKELOMSCHRIJVING().toString(),font));
+					cell05.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell05);
+					
+					PdfPCell cell06 = new PdfPCell(new Phrase(tescik.get(i).getBESTELD().toString(),font));
+					cell06.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell06);
+					
+					PdfPCell cell07 = new PdfPCell(new Phrase(tescik.get(i).getGELEVERD().toString(),font));
+					cell07.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell07);
+					
+					
+				
+					//	PdfPCell cell08 = new PdfPCell(new Phrase(tescik.get(i).getBESTELDATUM().toString(),font)); // <- potencjalny blad
+					PdfPCell cell08 = new PdfPCell(new Phrase("-",font));
+						cell08.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table1.addCell(cell08);
+					
+					if(tescik.get(i).getLEVERDATUM().equals(" ") || tescik.get(i).getLEVERDATUM().equals(null))
+					{
+						PdfPCell cell09 = new PdfPCell(new Phrase("-",font));
+						cell09.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table1.addCell(cell09);
+					}
+					else
+					{
+						PdfPCell cell09 = new PdfPCell(new Phrase(tescik.get(i).getLEVERDATUM().toString(),font));
+						cell09.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table1.addCell(cell09);
+					}
+					
+					PdfPCell cell10 = new PdfPCell(new Phrase(tescik.get(i).getLEVERINGSDATUMEFFECTIEF().toString(),font));
+					cell10.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell10);
+					
+					PdfPCell cell11 = new PdfPCell(new Phrase(tescik.get(i).getLEVERINGSDATUMINGAVERECEPTIE().toString(),font));
+					cell11.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell11);
+					
+					PdfPCell cell12 = new PdfPCell(new Phrase(tescik.get(i).getEENHEIDSPRIJS().toString(),font));
+					cell12.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell12);
+					
+					PdfPCell cell13 = new PdfPCell(new Phrase(tescik.get(i).getMUNT().toString(),font));
+					cell13.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell13);
+					
+					PdfPCell cell14 = new PdfPCell(new Phrase(tescik.get(i).getTOTAAL().toString(),font));
+					cell14.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table1.addCell(cell14);
+					
+			        document.add(table1);
+			        table1.flushContent();
+			        
+			        
+			        
+			        /*
+			         *  searchin on list of stukture to find similar object
+			         */
+			        
+					for(int x = 0 ; x <Lista_ze_struktur.size(); x++ )
+		   			{
+		   				// jesli element z kalkulacji koncowej jest rowny ktoremus elementowi z list struktur
+			   			if(tescik.get(i).getARTIKELCODE().equals(Lista_ze_struktur.get(x).getARTIKELCODE()))
+			   					{
+
+				   			PdfPTable table_poziom0;
+				   			table_poziom0 = new PdfPTable(new float[] {410,410,410,410});
+				   			table_poziom0.setTotalWidth(1640);
+				   			table_poziom0.setLockedWidth(true);
+				   			table_poziom0.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+				   			int c1 = 220;
+				   			int c2 = 220;
+				   			int c3 = 220;
+				   			
+				   		 PdfPCell c01 = new PdfPCell(new Phrase( Lista_ze_struktur.get(x).getONDERDEEL(),font));
+				   		c01.setBackgroundColor(new BaseColor(c1, c2, c3)); 
+				   		c01.setHorizontalAlignment(Element.ALIGN_CENTER);
+				   		table_poziom0.addCell(c01);
+				   			
+				  		 PdfPCell c02 = new PdfPCell(new Phrase(Lista_ze_struktur.get(x).getCFOMSONDERDEEL(),font));
+				  		c02.setBackgroundColor(new BaseColor(c1, c2, c3)); 
+				  		c02.setHorizontalAlignment(Element.ALIGN_CENTER);
+				   		table_poziom0.addCell(c02);
+				   		
+				  		 PdfPCell c03 = new PdfPCell(new Phrase(decForm.format(Lista_ze_struktur.get(x).getCenaMaterialu()),font));
+				  		c03.setBackgroundColor(new BaseColor(c1, c2, c3)); 
+				  		c03.setHorizontalAlignment(Element.ALIGN_CENTER);
+				   		table_poziom0.addCell(c03);
+				   		
+				  		 PdfPCell c04 = new PdfPCell(new Phrase( decForm.format(Lista_ze_struktur.get(x).getCenaPracy()),font));
+				  		c04.setBackgroundColor(new BaseColor(c1, c2, c3)); 
+				  		c03.setHorizontalAlignment(Element.ALIGN_CENTER);
+				   		table_poziom0.addCell(c04);
+						
+			   			
+				   		 	document.add(table_poziom0);
+			   					}
+
+		   			}
+		   			
+			        
+			        
+			        
+			   }
+	        		
+
+		   document.close();
+	
+	}
+	
+	
+	
 
 
 }
