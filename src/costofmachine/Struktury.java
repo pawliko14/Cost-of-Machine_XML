@@ -21,9 +21,20 @@ public class Struktury {
 	private String GlownyProjekt;
 
 	private Double CenaPracyRazyIlosc;
+	private String TYP_Nadrzednego;
+	
+	
 
 	
 	
+	public String getTYP_Nadrzednego() {
+		return TYP_Nadrzednego;
+	}
+
+	public void setTYP_Nadrzednego(String tYP_Nadrzednego) {
+		TYP_Nadrzednego = tYP_Nadrzednego;
+	}
+
 	public String getGlownyProjekt() {
 		return GlownyProjekt;
 	}
@@ -157,7 +168,7 @@ public class Struktury {
 			System.out.println("Cena Materialu Razy Ilosc: " + this.CenaMaterialuRazyIlosc);
 			System.out.println("Cena Pracy za szt: " + this.CenaPracy);
 			System.out.println("Cena Pracy Razy Ilosc: " + this.CenaPracyRazyIlosc);
-
+			System.out.println("TYP nadrzednego art.c: " + this.TYP_Nadrzednego);
 
 			System.out.println("                              ");
 			

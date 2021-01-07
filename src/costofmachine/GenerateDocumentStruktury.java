@@ -306,7 +306,7 @@ public class GenerateDocumentStruktury {
 			   		   	  	table_cell08.setHorizontalAlignment(Element.ALIGN_CENTER);
 							table0.addCell(table_cell08);
 						}
-						PdfPCell table_cell09 = new PdfPCell(new Phrase(List.get(i).getTYP()));
+						PdfPCell table_cell09 = new PdfPCell(new Phrase(List.get(i).getTYP_Nadrzednego()));
 						table_cell09.setBackgroundColor(new BaseColor(c1, c2, c3));
 		   		   	  	table_cell09.setHorizontalAlignment(Element.ALIGN_CENTER);
 						table0.addCell(table_cell09);

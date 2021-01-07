@@ -37,13 +37,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class CountMaterial2test {
 	 static String MASZYNA = Main.text; // na sztywno, potem mozliwosc zmiany w gui
-	 static String Maszynka ="190521";
-	// static String Maszynka = "170700";
-	// static String Maszynka ="190522"; // jakis problem brakuje kolejnosci jak w poprzednich przykladach
-	// static String Maszynka ="170506"; // duza ilosc podprojektow, problem z podprojektem 17050602, brakuje czesci rzeczy ze zlozenia, wyladowaly w innym zlozeniu
-	// static String Maszynka = "170801";
-	// static String Maszynka = "180564";  // 10 podprojektow 02 -> 12 , kolejnosc w miare sie zgadza, brak duzej czesci danych o kosztach artykulow(zwlaszcza gdzie dostawca jest SACA(1190031) 
-
+	 
+	 static String Maszynka = "GUB5/20062.1"; // <- element do testow
+	 
 	 
 	 static String GlownyProjektDlaArtykulu = "";
 	 private static Map<String,String> ListaGlownychZlozenIPodzlozen;
@@ -71,12 +67,6 @@ public class CountMaterial2test {
 					 getListaGLownychZlozen(Maszynka,conn);
 					 
 						
-
-					
-					 		//remove not working structure
-//						for(int i = 0 ; i < ListaGlownychZlozen.size();i++)
-//							if(ListaGlownychZlozen.get(i).equals("%%360A-030-4000/000"))
-//								ListaGlownychZlozen.remove(i);
 							
 										Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
 										int it = 0;
@@ -103,8 +93,8 @@ public class CountMaterial2test {
 //			
 //			
 //			// generowanie dokumentu
-//			GenerateDocumentStruktury dokument_Struktury = new GenerateDocumentStruktury();
-//			dokument_Struktury.Generate(ListofStructuresTest, conn, Maszynka);
+			GenerateDocumentStruktury dokument_Struktury = new GenerateDocumentStruktury();
+			dokument_Struktury.Generate(ListofStructuresTest, conn, Maszynka);
 					
 			
 			
@@ -129,6 +119,7 @@ public class CountMaterial2test {
 			dokument_kalkulacja.Generate_v2(tescik, conn, Maszynka,ListofStructuresTest);
 
 			
+			conn.close();			
 			System.out.println("done");
 	}
 		
@@ -161,136 +152,7 @@ public class CountMaterial2test {
 
 		// dlugosc wykonywania operacji jest zbyt dlugi do testowania ( ostatni run trwal 1,5h)
 
-//		private static void GetAllPrices(Connection conn) throws SQLException {
-//			
-//			// get from calendar begin date ( data produkcji) and ends date( data koniec montazu)
-//			
-//			String BeginDate = "";
-//			String EndDate = "";
-//			
-//			Statement state = conn.createStatement();
-//			ResultSet result = state.executeQuery("select DataProdukcji, DataKoniecMontazu from calendar where NrMaszyny like  '%"+Maszynka+"' order by NrMaszyny desc limit 1"); // in this case it is not sure that it will be 2/
-//			
-//			while(result.next())
-//			{
-//				BeginDate =result.getString("DataProdukcji");
-//				EndDate =result.getString("DataKoniecMontazu");
-//			}
-//			state.close();
-//			result.close();
-//			
-//			System.out.println("Data pocza: "+ BeginDate);
-//			System.out.println("Data koniec: "+ EndDate);
-//
-//			
-//			
-//		//	for(int i = 0 ; i < ListofStructuresTest.size();i++)
-//			for(int i = 0 ; i < ListofStructuresTest.size();i++)
-//			{						
-//				
-//			//	System.out.println("Element z listy: "+ ListofStructuresTest.get(i).getARTIKELCODE());
-//
-//				
-//					String artikelkod = ListofStructuresTest.get(i).getONDERDEEL();
-//					
-//					
-//					Statement b = conn.createStatement();
-//				//	ResultSet rs2 = b.executeQuery("select ARTIKELCODE,MATERIAAL,LONEN from artikel_kostprijs where ARTIKELCODE = '"+artikelkod+"' and SOORT = '4'");
-//					
-//					ResultSet rs2 = b.executeQuery("select ARTIKELCODE, MATERIAAL,LONEN  from artikel_kostprijs_allsort\r\n" + 
-//							"where ARTIKELCODE = '"+artikelkod+"'\r\n" + 
-//							"and DATUM between '"+BeginDate+"' and '"+EndDate+"'\r\n" + 
-//							"and SOORT = '4' order by DATUM desc limit 1");
-//					
-//					if (!rs2.isBeforeFirst() ) { 
-//						
-//							Statement st1 = conn.createStatement();							
-//							ResultSet rs1 = st1.executeQuery("select ARTIKELCODE, MATERIAAL, LONEN  from artikel_kostprijs_allsort where SOORT = '4'\r\n" + 
-//									"and ARTIKELCODE = '"+artikelkod+"'\r\n" + 
-//									"order by DATUM desc limit 1 ");
-//						
-//						// if resultset is completly empty set it all to 0.0
-//							if (!rs1.isBeforeFirst() ) 
-//							{ 						
-//								ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(0.0);
-//								ListofStructuresTest.get(i).setCenaMaterialu(0.0);
-//								ListofStructuresTest.get(i).setCenaPracy(0.0);
-//							}
-//							else
-//							{
-//								while(rs1.next())
-//								{
-//									if(rs1.getString("MATERIAAL").equals("")|| rs1.getString("MATERIAAL").equals(null))
-//										ListofStructuresTest.get(i).setCenaMaterialu(0.0);
-//									
-//									else
-//										ListofStructuresTest.get(i).setCenaMaterialu(Double.parseDouble(rs1.getString("MATERIAAL")));
-//									
-//									Double cena = ListofStructuresTest.get(i).getCenaMaterialu();
-//									Double ilosc = ListofStructuresTest.get(i).getILOSC();
-//
-//									
-//									Double cenaRazyIlosc = cena * ilosc;				
-//									ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(cenaRazyIlosc);
-//									
-//									if(rs1.getString("LONEN").equals("")|| rs1.getString("LONEN").equals(null))
-//										ListofStructuresTest.get(i).setCenaPracy(0.0);	
-//								
-//									else
-//										ListofStructuresTest.get(i).setCenaPracy(Double.parseDouble(rs1.getString("LONEN")));
-//
-//									Double cenaPracySzt = ListofStructuresTest.get(i).getCenaPracy();
-//									Double pracaRazyIlosc = cenaPracySzt * ilosc;
-//									
-//									ListofStructuresTest.get(i).setCenaPracyRazyIlosc(pracaRazyIlosc);
-//									
-//									//Add to summary:
-//									CalosciowaCenaPracy += ListofStructuresTest.get(i).getCenaPracyRazyIlosc();
-//									CalosciowaCenaMaterialu += ListofStructuresTest.get(i).getCenaMaterialuRazyIlosc();
-//								}
-//							}
-//							st1.close();
-//							rs1.close();
-//						
-//					}
-//					else
-//					{
-//						while(rs2.next())
-//						{
-//							
-//						if(rs2.getString("MATERIAAL").equals("")|| rs2.getString("MATERIAAL").equals(null))
-//							ListofStructuresTest.get(i).setCenaMaterialu(0.0);
-//						
-//						else
-//							ListofStructuresTest.get(i).setCenaMaterialu(Double.parseDouble(rs2.getString("MATERIAAL")));
-//						
-//						Double cena = ListofStructuresTest.get(i).getCenaMaterialu();
-//						Double ilosc = ListofStructuresTest.get(i).getILOSC();
-//
-//						
-//						Double cenaRazyIlosc = cena * ilosc;				
-//						ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(cenaRazyIlosc);
-//						
-//						if(rs2.getString("LONEN").equals("")|| rs2.getString("LONEN").equals(null))
-//							ListofStructuresTest.get(i).setCenaPracy(0.0);	
-//					
-//						else
-//							ListofStructuresTest.get(i).setCenaPracy(Double.parseDouble(rs2.getString("LONEN")));
-//
-//						Double cenaPracySzt = ListofStructuresTest.get(i).getCenaPracy();
-//						Double pracaRazyIlosc = cenaPracySzt * ilosc;
-//						
-//						ListofStructuresTest.get(i).setCenaPracyRazyIlosc(pracaRazyIlosc);
-//						
-//						//Add to summary:
-//						CalosciowaCenaPracy += ListofStructuresTest.get(i).getCenaPracyRazyIlosc();
-//						CalosciowaCenaMaterialu += ListofStructuresTest.get(i).getCenaMaterialuRazyIlosc();
-//						}
-//					}
-//					b.close();
-//					rs2.close();			
-//			}		
-//		}
+
 		
 		
 private static void GetAllPrices(Connection conn) throws SQLException {
@@ -371,16 +233,26 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 				StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
 				StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
 				StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
+				StrukturaTmp.setTYP(rs2.getString("TYP"));
+				
 				
 					if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty())
 					{
-						StrukturaTmp.setTYP(rs2.getString("TYP"));
+						
+						String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt ,conn);
+						StrukturaTmp.setTYP_Nadrzednego(typeFrom);
+						
+					//	StrukturaTmp.setTYP(rs2.getString("TYP"));
+					//	System.out.println("zostalo dodane dla artikelcode : " +  articlecode);
+						
 
 					}
 					else
 					{
-						StrukturaTmp.setTYP("Y"); // if the type is not known set is as Y
+						StrukturaTmp.setTYP_Nadrzednego("WRONG"); // if the type is not known set is as Y
 					}
+
+				
 				StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
 				StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
 				
@@ -388,8 +260,8 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 
 				ListofStructuresTest.add(StrukturaTmp);
 				
-		
-//				for(Struktury  st: ListofStructuresTest)
+//		
+//			for(Struktury  st: ListofStructuresTest)
 //				st.Show();
 							
 			if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
@@ -408,10 +280,33 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 		}
 		
 		
+		private static String PushValidTypeForHigherLevelOfStructures(String articlecode, String onderdeel,Connection conn) throws SQLException {
+			
+			String results = null;
+			
+			Statement b = conn.createStatement();			
+			ResultSet rs2 = b.executeQuery("select TYP from struktury s \r\n" + 
+					"	where ONDERDEEL  = '"+articlecode+"'\r\n" + 
+					"	and ARTIKELCODE  = '"+onderdeel+"'");
+			
+			if(rs2.next())
+			{
+				results = rs2.getString("TYP");
+			}
+						
+			return results;
+		}
+
+
 		public static void getListaGLownychZlozen(String art, Connection conn) throws SQLException
 		 {
 			Statement b = conn.createStatement();			
-			ResultSet rs2 = b.executeQuery("select ARTIKELCODE, ONDERDEEL from struktury where ARTIKELCODE like '"+art+"%' order by ARTIKELCODE asc ");
+		//	ResultSet rs2 = b.executeQuery("select ARTIKELCODE, ONDERDEEL from struktury where ARTIKELCODE like '"+art+"%' order by ARTIKELCODE asc ");
+			
+			
+			//temporary
+			ResultSet rs2 = b.executeQuery("select ARTIKELCODE, ONDERDEEL from struktury where ARTIKELCODE = '"+art+"' order by SEQ asc ");
+
 			
 			while(rs2.next()){
 				ListaGlownychZlozenIPodzlozen.put(rs2.getString("ONDERDEEL"), rs2.getString("ARTIKELCODE"));
