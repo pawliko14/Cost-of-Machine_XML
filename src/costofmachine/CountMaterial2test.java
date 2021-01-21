@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import GttDatabaseManipulate.PushStructuresToGTTDB;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import com.itextpdf.text.BaseColor;
@@ -35,11 +36,10 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.sqlite.core.DB;
 
 public class CountMaterial2test {
-	 static String MASZYNA = Main.text; // na sztywno, potem mozliwosc zmiany w gui
-	 
-	 static String Maszynka = "210900P"; // <- element do testow
+	 static String Maszynka = "7112414"; // <- element do testow
 	 
 	 
 	 static String GlownyProjektDlaArtykulu = "";
@@ -57,7 +57,7 @@ public class CountMaterial2test {
 	 
 		public static void run() throws DocumentException, IOException, SQLException {
 			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
-			Connection connection= DB.GttDBConnection.dbConnector();
+		//	Connection connection= DB.GttDBConnection.dbConnector();
 
 			
 		
@@ -90,122 +90,36 @@ public class CountMaterial2test {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-//			PodsumowanieKoncowe();
-//			GetCenaKonstrukcja_CNC_Elektronicy(conn);			
-//			Podsumowanie();
-//			
-//			
-//			// generowanie dokumentu
-			GenerateDocumentStruktury dokument_Struktury = new GenerateDocumentStruktury();
-			dokument_Struktury.Generate(ListofStructuresTest, conn, Maszynka);
-					
-			
-			PushTOdatabaseAllDataFromStructure();
-			
-			
-			// ---------------------------------------------------------------
-			// sprawdzenie afterkalkulacji -> czyli kalkulacji koncowej(storenotesdetail)
-			// ---------------------------------------------------------------
 
-			GetDataFromAftercalculations AfterCalculationsObiekt = new GetDataFromAftercalculations();
-			
-			AfterCalculationsObiekt.GetWholeData_from_storenotesDetail(conn, Maszynka);
-			AfterCalculationsObiekt.GetWholeData_from_receptie(conn, Maszynka);
-				
-			ArrayList<AfterCalculationsStrukture> tescik = AfterCalculationsObiekt.PrzekazObiekt();
-			
-			AfterCalculationsObiekt.ShowAllInList(tescik);		
-			AfterCalculationsObiekt.PrintTofile(tescik);
-			
-		// generowanie dokumentu
-		GenerateDocumentKalkulacjaKoncowa dokument_kalkulacja = new GenerateDocumentKalkulacjaKoncowa();
-		
-		//dokument_kalkulacja.Generate(tescik, conn, Maszynka); // first version, without passing main array
-			dokument_kalkulacja.Generate_v2(tescik, conn, Maszynka,ListofStructuresTest);
+//			// Generate PDF document
+//			GenerateDocumentStruktury dokument_Struktury = new GenerateDocumentStruktury();
+//			dokument_Struktury.Generate(ListofStructuresTest, conn, Maszynka);
+//
 
-			
-			conn.close();		
-			
-			printInfoOfListofStructuresTest();
+//			//check for opened projects
+//			boolean DoesProjectHasDataInMachineSubprojects = GetListOfMachines_InStructureDetail();
+
+
+			// push strukture to database IF strukture projects does not exists
+
+			//Object for pushing data into GTT Database
+
+			PushStructuresToGTTDB DBPusherGTT = new PushStructuresToGTTDB(ListofStructuresTest);
+
+			// private temporary
+		//	DBPusherGTT.PushStructureToDatabase();
+
+			//temporary
+			DBPusherGTT.PushOpenProjectListTODB();
+
+
+			conn.close();
+		//	printInfoOfListofStructuresTest();
 			
 			System.out.println("done");
 	}
 		
 		
-		   public static void PushTOdatabaseAllDataFromStructure() throws SQLException {
-			
-			   Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
-			   PreparedStatement sttmnt = null;
-			
-			for(int i = 0 ; i < ListofStructuresTest.size();i++)
-			{
-					sttmnt= connGTT.prepareStatement("insert into machine_structure_details (MACHINENUMBER ,PARENTARTICLE ,CHILDARTICLE ,QUANTITY ,`TYPE` ,`LEVEL` )\r\n" + 
-		    		"values (?,?,?,?,?,?)");  
-
-	        try 
-	        {
-
-	        	sttmnt.setString(1, ListofStructuresTest.get(i).getGlownyProjekt());
-	        	sttmnt.setString(2, ListofStructuresTest.get(i).getARTIKELCODE());
-	        	sttmnt.setString(3, ListofStructuresTest.get(i).getONDERDEEL());
-	        	sttmnt.setInt(4, 0);
-	        	sttmnt.setString(5, ListofStructuresTest.get(i).getTYP());
-	        	sttmnt.setInt(6, ListofStructuresTest.get(i).getPoziom());
-
-
-	        	
-	        	
-          
-	            
-	            sttmnt.addBatch();
-	            sttmnt.executeBatch();
-	     
-
-	            // rows affected
-	            System.out.println("done for: " + i); 
-
-	        } catch (SQLException e) {
-	            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-			}
-				connGTT.close();		
-
-		}
-
-
-		private static void insertionTest(Connection connection) {
-
-
-
-		    String SQL_INSERT = "insert into Machine (ID,MACHINENUMBER ) values (?,?)";
-		 
-
-		        try (Connection conn = DriverManager.getConnection(
-		                "jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
-		             PreparedStatement preparedStatement = conn.prepareStatement(SQL_INSERT)) {
-
-		            preparedStatement.setInt(1, 2);
-		            preparedStatement.setString(2, "21090");
-
-
-		            int row = preparedStatement.executeUpdate();
-
-		            // rows affected
-		            System.out.println(row); //1
-
-		        } catch (SQLException e) {
-		            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-		        } catch (Exception e) {
-		            e.printStackTrace();
-		        }
-
-		    
-			
-		
-		}
 
 
 		private static void printInfoOfListofStructuresTest() {
@@ -439,22 +353,11 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 
 		public static void GetCenaKonstrukcja_CNC_Elektronicy(Connection conn) throws SQLException
 		{
-			
-			//String sql_b = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost NOT IN ('KM01', 'KE01', 'CNC') and (cfproject like '"+Maszynka+"%')";
 			String sql_e = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'KM01' and (cfproject like '%"+Maszynka+"%')";
 			String sql_f = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'KE01' and (cfproject like '%"+Maszynka+"%')";
 			String sql_g = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'CNC' and (cfproject like '%"+Maszynka+"%')";
 		
-			
-//			//koszt montazu
-//			Statement b = conn.createStatement();
-//			ResultSet rs1 = b.executeQuery(sql_b);
-//			while(rs1.next()) {
-//				montage+=rs1.getDouble(1);
-//			}
-//			rs1.close();
-//			b.close();
-			
+
 			//koszt konstrukcji
 			Statement e = conn.createStatement();
 			ResultSet rs5 = e.executeQuery(sql_e);
