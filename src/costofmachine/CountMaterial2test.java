@@ -112,6 +112,7 @@ public class CountMaterial2test {
 			//temporary
 			DBPusherGTT.PushOpenProjectListTODB();
 
+			DBPusherGTT.PushSubProjectsToDB();
 
 			conn.close();
 		//	printInfoOfListofStructuresTest();
