@@ -1,8 +1,7 @@
-package costofmachine;
+package main.java.costofmachine;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -25,6 +24,9 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import costofmachine.AfterCalculationsStrukture;
+import main.java.Parameters.Parameters;
+import main.java.Objetcs.Struktury;
 
 public class GenerateDocumentKalkulacjaKoncowa {
 

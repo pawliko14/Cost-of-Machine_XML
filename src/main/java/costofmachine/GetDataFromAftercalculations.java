@@ -1,4 +1,7 @@
-package costofmachine;
+package main.java.costofmachine;
+
+import costofmachine.AfterCalculationsStrukture;
+import main.java.Parameters.Parameters;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

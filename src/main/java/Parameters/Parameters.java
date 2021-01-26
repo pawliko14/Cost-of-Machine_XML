@@ -1,4 +1,4 @@
-package costofmachine;
+package main.java.Parameters;
 
 public class Parameters {
 	

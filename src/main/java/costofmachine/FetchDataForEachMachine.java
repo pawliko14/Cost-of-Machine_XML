@@ -1,4 +1,4 @@
-package costofmachine;
+package main.java.costofmachine;
 
 
 
@@ -8,64 +8,48 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
-import GttDatabaseManipulate.PushStructuresToGTTDB;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+import main.java.Parameters.Parameters;
+import main.java.GttDatabaseManipulate.PushMachineTOStuctureDetail;
+import main.java.Objetcs.Struktury;
 
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
-import org.sqlite.core.DB;
 
-public class CountMaterial2test {
-	 static String Maszynka = "7112414"; // <- element do testow
+public class FetchDataForEachMachine {
+
+	static String GlownyProjektDlaArtykulu = "";
+	private static Map<String,String> ListaGlownychZlozenIPodzlozen;
+	//testowa struktura, na potrzeby programu Asi
+	private static ArrayList<Struktury>ListofStructuresTest;
+	private static int iloscZaglebien = 0;
+	private static Double CalosciowaCenaPracy = 0.0;
+	private static Double CalosciowaCenaKonstrukcja = 0.0;
+	private static Double CalosciowaCenaMaterialu = 0.0;
+	private static int CenaPracoGodziny = 120; // kiedys, dowiedziec sie kiedy cena pracy to bylo 100zl, aktualnie jest 120zl
+
+	public FetchDataForEachMachine()
+	{
+
+	}
+
+	 
+
 	 
 	 
-	 static String GlownyProjektDlaArtykulu = "";
-	 private static Map<String,String> ListaGlownychZlozenIPodzlozen;
-	 //testowa struktura, na potrzeby programu Asi
-	 private static ArrayList<Struktury>ListofStructuresTest;
-	 private static int iloscZaglebien = 0; 
-	 private static Double CalosciowaCenaPracy = 0.0;
-	 private static Double CalosciowaCenaKonstrukcja = 0.0;
-	 private static Double CalosciowaCenaProgramisciCNC = 0.0;
-	 private static Double CalosciowaCenaElektronicy = 0.0;
-	 private static Double CalosciowaCenaMaterialu = 0.0; 
-	 private static int CenaPracoGodziny = 120; // kiedys, dowiedziec sie kiedy cena pracy to bylo 100zl, aktualnie jest 120zl
-	 
-	 
-		public static void run() throws DocumentException, IOException, SQLException {
+		public static void run(String Maszynka) throws  IOException, SQLException {
 			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
-		//	Connection connection= DB.GttDBConnection.dbConnector();
 
-			
-		
+
 			
 			try {
-				
-							
-					
 					 ListofStructuresTest = new ArrayList<Struktury>();				 			 			 
 					 ListaGlownychZlozenIPodzlozen = new LinkedHashMap<String,String>(); // LinkedHashMap - preserver the insertion order, have to used Linked one
 					 getListaGLownychZlozen(Maszynka,conn);
@@ -91,32 +75,12 @@ public class CountMaterial2test {
 				e.printStackTrace();
 			}
 
-//			// Generate PDF document
-//			GenerateDocumentStruktury dokument_Struktury = new GenerateDocumentStruktury();
-//			dokument_Struktury.Generate(ListofStructuresTest, conn, Maszynka);
-//
-
-//			//check for opened projects
-//			boolean DoesProjectHasDataInMachineSubprojects = GetListOfMachines_InStructureDetail();
+			PushMachineTOStuctureDetail machinePusher = new PushMachineTOStuctureDetail(ListofStructuresTest);
+			machinePusher.PushStructureToDatabase();
 
 
-			// push strukture to database IF strukture projects does not exists
-
-			//Object for pushing data into GTT Database
-
-			PushStructuresToGTTDB DBPusherGTT = new PushStructuresToGTTDB(ListofStructuresTest);
-
-			// private temporary
-		//	DBPusherGTT.PushStructureToDatabase();
-
-			//temporary
-			DBPusherGTT.PushOpenProjectListTODB();
-
-			DBPusherGTT.PushSubProjectsToDB();
 
 			conn.close();
-		//	printInfoOfListofStructuresTest();
-			
 			System.out.println("done");
 	}
 		
@@ -266,7 +230,9 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 					}
 
 				
-				StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
+			//	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
+				//TEMPORARY
+				StrukturaTmp.setILOSC(0.0);
 				StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
 				
 
@@ -329,70 +295,10 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 			
 		 }
 		
-		public static void PodsumowanieKoncowe()
-		{
-			System.out.println("Podsumowanie Koncowe:");
-			System.out.println("Cena pracy(wszystko):" + CalosciowaCenaPracy);
-			System.out.println("Cena Materialu(wszystko):" + CalosciowaCenaMaterialu);
-
-			
-			
-		}
-		
-		public static void Podsumowanie()
-		{
-			Double EUro = 4.2;
-			System.out.println("Podsumowanie :");
-			Double cenafinalnaPLN = CalosciowaCenaKonstrukcja+CalosciowaCenaElektronicy+CalosciowaCenaProgramisciCNC+CalosciowaCenaPracy+CalosciowaCenaMaterialu;
-			System.out.println("Podsumowanie Koncowe:"+ cenafinalnaPLN + " PLN");
-			
-			Double cenafinalnaEUR = cenafinalnaPLN / EUro ;
-			System.out.println("Podsumowanie Koncowe:"+ cenafinalnaEUR + " EUR");
 
 
-		}
 
-		public static void GetCenaKonstrukcja_CNC_Elektronicy(Connection conn) throws SQLException
-		{
-			String sql_e = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'KM01' and (cfproject like '%"+Maszynka+"%')";
-			String sql_f = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'KE01' and (cfproject like '%"+Maszynka+"%')";
-			String sql_g = "select ("+CenaPracoGodziny+"*(sum(werktijdh)+floor(sum(werktijdm60)/60) + 10*mod(sum(werktijdm60), 60)/6)) as montage from werkuren where werkpost = 'CNC' and (cfproject like '%"+Maszynka+"%')";
-		
 
-			//koszt konstrukcji
-			Statement e = conn.createStatement();
-			ResultSet rs5 = e.executeQuery(sql_e);
-			while(rs5.next()) {
-				CalosciowaCenaKonstrukcja+=rs5.getDouble(1);
-			}
-			rs5.close();
-			e.close();
-			
-			//koszt elektrykow
-			Statement f = conn.createStatement();
-			ResultSet rs6 = f.executeQuery(sql_f);
-			while(rs6.next()) {
-				CalosciowaCenaElektronicy+=rs6.getDouble(1);
-			}
-			rs6.close();
-			f.close();
-			
-			//koszt cnc
-			Statement g = conn.createStatement();
-			ResultSet rs7 = g.executeQuery(sql_g);
-			while(rs7.next()) {
-				CalosciowaCenaProgramisciCNC+=rs7.getDouble(1);
-			}
-			rs7.close();
-			g.close();
-			
-			
-			System.out.println("Podsumowanie Koncowe:");
-			System.out.println("Cena pracy(Konstrukcja):" + CalosciowaCenaKonstrukcja);
-			System.out.println("Cena pracy(elektrykow):" + CalosciowaCenaElektronicy);
-			System.out.println("Cena pracy(CNC):" + CalosciowaCenaProgramisciCNC);
-			
-		}
 				
 }
 

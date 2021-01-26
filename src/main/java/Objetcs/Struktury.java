@@ -1,4 +1,4 @@
-package costofmachine;
+package main.java.Objetcs;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;

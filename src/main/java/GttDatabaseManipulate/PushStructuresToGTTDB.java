@@ -1,6 +1,6 @@
-package GttDatabaseManipulate;
+package main.java.GttDatabaseManipulate;
 
-import costofmachine.Struktury;
+
 
 import java.lang.reflect.Array;
 import java.sql.*;
@@ -9,16 +9,22 @@ import java.util.List;
 
 public class PushStructuresToGTTDB {
 
-    List<Struktury> MachineStructure;
     List<String> OpenedMachines;
     List<String> SubProjects;
 
-    public PushStructuresToGTTDB(ArrayList<Struktury> MS)
+    public PushStructuresToGTTDB()
     {
-        MachineStructure = new ArrayList<>();
         OpenedMachines = new ArrayList<>();
         SubProjects = new ArrayList<>();
-        MachineStructure = MS;
+    }
+
+
+    public List<String> getListOfOpenedMachines() {
+        return OpenedMachines;
+    }
+
+    public List<String> getListOfSUbProjects() {
+        return SubProjects;
     }
 
 
@@ -67,10 +73,15 @@ public class PushStructuresToGTTDB {
                 }
                 else {
 
+
+
                     PreparedStatement sttmnt_3 = null;
                     while (resultSet.next()) {
                         String ORDERNUMMER = resultSet.getString("ORDERNUMMER");
                         String STATUSCODE = resultSet.getString("STATUSCODE");
+
+                        // push to List
+                        SubProjects.add(ORDERNUMMER);
 
                         //push data to database -> Machine_subprojetcs
                         sttmnt_3 = connGTT.prepareStatement("insert into Machine_subprojetcs(MACHINENUMBER ,MACHINENUMBERSUBPROJECT,STATUSCODE) values (?,?,?)");
@@ -114,7 +125,6 @@ public class PushStructuresToGTTDB {
         Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
 
         // truncate existing data  for replacing
-
         PreparedStatement sttmnt = null;
             sttmnt = connGTT.prepareStatement("Truncate table Machine");
             sttmnt.addBatch();
@@ -130,12 +140,10 @@ public class PushStructuresToGTTDB {
             sttmnt_2.setString(1, this.OpenedMachines.get(i));
 
 
-
             sttmnt_2.addBatch();
             sttmnt_2.executeBatch();
         }
         sttmnt_2.close();
-
         connGTT.close();
     }
 
@@ -166,78 +174,18 @@ public class PushStructuresToGTTDB {
     }
 
 
-
-    private void PushStructureToDatabase() throws SQLException {
+    public void TruncateStructurestable() throws SQLException {
 
         Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
+
+        // truncate existing data  for replacing
         PreparedStatement sttmnt = null;
-
-        for(int i = 0 ; i < this.MachineStructure.size();i++)
-        {
-            sttmnt= connGTT.prepareStatement("insert into machine_structure_details (MACHINENUMBER ,PARENTARTICLE ,CHILDARTICLE ,QUANTITY ,`TYPE` ,`LEVEL` )\r\n" +
-                    "values (?,?,?,?,?,?)");
-
-            try
-            {
-
-                sttmnt.setString(1, this.MachineStructure.get(i).getGlownyProjekt());
-                sttmnt.setString(2, this.MachineStructure.get(i).getARTIKELCODE());
-                sttmnt.setString(3, this.MachineStructure.get(i).getONDERDEEL());
-                sttmnt.setInt(4, 0); // temporary 0 as there is no quantity yet
-                sttmnt.setString(5, this.MachineStructure.get(i).getTYP());
-                sttmnt.setInt(6, this.MachineStructure.get(i).getPoziom());
-
-
-                sttmnt.addBatch();
-                sttmnt.executeBatch();
-
-
-                // rows affected
-                System.out.println("done for: " + i);
-
-            } catch (SQLException e) {
-                System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
+        sttmnt = connGTT.prepareStatement("Truncate table Machine_subprojetcs");
+        sttmnt.addBatch();
+        sttmnt.executeBatch();
         sttmnt.close();
-        connGTT.close();
 
+
+        System.out.println("Truncate Table : MachineSubprojects done");
     }
-
-
-
-
-
-
-
-
-
-
-
- // test
-    private  void insertionTest(Connection connection) {
-
-        String SQL_INSERT = "insert into Machine (ID,MACHINENUMBER ) values (?,?)";
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
-             PreparedStatement preparedStatement = conn.prepareStatement(SQL_INSERT)) {
-            preparedStatement.setInt(1, 2);
-            preparedStatement.setString(2, "21090");
-
-
-            int row = preparedStatement.executeUpdate();
-            System.out.println(row); //1
-
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
 }

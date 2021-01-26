@@ -1,4 +1,4 @@
-package costofmachine;
+package main.java.DB;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
