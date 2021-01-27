@@ -114,7 +114,12 @@ public class PushMachineSubprojectToStructureDetail {
     /**
      * PUSH COLECTED DATA FROM SUBPROJECTS TO DATABASE
      */
-    public void PushStructureToDatabase() throws SQLException {
+    public void PushStructureToDatabase(String MachineNumber) throws SQLException {
+
+
+        // 70052001 > 700520
+       String MachineNumberCutLast2Char = MachineNumber.substring(0, MachineNumber.length() - 2);
+
 
         Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
         PreparedStatement sttmnt = null;
@@ -127,7 +132,7 @@ public class PushMachineSubprojectToStructureDetail {
 
             try
             {
-                sttmnt.setString(1, "temporary");
+                sttmnt.setString(1, MachineNumberCutLast2Char);
                 sttmnt.setString(2, this.MachineStructure.get(i).getGlownyProjekt());
                 sttmnt.setString(3, this.MachineStructure.get(i).getARTIKELCODE());
                 sttmnt.setString(4, this.MachineStructure.get(i).getONDERDEEL());

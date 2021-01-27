@@ -3,11 +3,18 @@ package main.java.StartingClass;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 
 import main.java.GttDatabaseManipulate.PushStructuresToGTTDB;
 import main.java.costofmachine.FetchDataForEachMachine;
 import main.java.costofmachine.FetchSubprojectForEachMachine;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 
 public class Main {
@@ -21,6 +28,11 @@ public class Main {
 			public void run() {
 				try {
 
+					Logger logger = LoggerFactory.getLogger(Main.class);
+					logger.info("Hello World");
+
+
+
 					//push available projects to database
 
 					PushStructuresToGTTDB DBPusherGTT = new PushStructuresToGTTDB();
@@ -31,13 +43,12 @@ public class Main {
 					DBPusherGTT.PushSubProjectsToDB();
 
 					// print existing subprojetcs
-					DBPusherGTT.getListOfSUbProjects().forEach(System.out::println);
+				//	DBPusherGTT.getListOfSUbProjects().forEach(System.out::println);
 
 
 
-
-				//	PushGeneralProjectsStructuresToDatabase(DBPusherGTT);
-					PushSubprojectsStructuresToDatabase(DBPusherGTT);
+					PushGeneralProjectsStructuresToDatabase(DBPusherGTT);
+				//	PushSubprojectsStructuresToDatabase(DBPusherGTT);
 
 					//testing purpose
 				//	PushSubprojectsStructuresToDatabase(DBPusherGTT);
@@ -54,7 +65,38 @@ public class Main {
 		});
 	}
 
+	/**
+	 *
+	 * Pushes data(Structure) from General Project ( without subprojects) to table in  database
+	 *
+	 * @param DBPusherGTT
+	 * @throws IOException
+	 * @throws SQLException
+	 *
+	 *
+	 */
 	private static void PushGeneralProjectsStructuresToDatabase(PushStructuresToGTTDB DBPusherGTT) throws IOException, SQLException {
+
+
+		//TESTING
+
+
+
+		//clean - TRUNCATE - project table
+//		DBPusherGTT.TruncateStructurestable();
+//
+//		List<String> temp = Arrays.asList("200535	");
+//
+//		// run for each machine in loop, for now only projects, without subprojetcs
+//
+//			FetchDataForEachMachine.run(temp.get(0));
+
+
+
+
+		//DEPLOY
+
+
 
 		//clean - TRUNCATE - project table
 		DBPusherGTT.TruncateStructurestable();
@@ -65,6 +107,14 @@ public class Main {
 		}
 	}
 
+	/**
+	 * 	  pushes data(Structure) from SUbProject of General Project to table in database
+	 *
+	 * @param DBPusherGTT
+	 * @throws IOException
+	 * @throws SQLException
+	 *
+	 */
 	private static void PushSubprojectsStructuresToDatabase(PushStructuresToGTTDB DBPusherGTT) throws IOException, SQLException {
 
 		//clean - TRUNCATE - subProject table

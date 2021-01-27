@@ -6,21 +6,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.sql.*;
+import java.util.*;
 
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import main.java.Parameters.Parameters;
 import main.java.GttDatabaseManipulate.PushMachineTOStuctureDetail;
 import main.java.Objetcs.Struktury;
+import org.eclipse.birt.report.model.core.Structure;
 
 
 public class FetchDataForEachMachine {
@@ -35,18 +29,30 @@ public class FetchDataForEachMachine {
 	private static Double CalosciowaCenaMaterialu = 0.0;
 	private static int CenaPracoGodziny = 120; // kiedys, dowiedziec sie kiedy cena pracy to bylo 100zl, aktualnie jest 120zl
 
-	public FetchDataForEachMachine()
-	{
 
-	}
+    private boolean FirstLevelStructurePushed ;
 
-	 
 
-	 
-	 
-		public static void run(String Maszynka) throws  IOException, SQLException {
+
+
+
+    public static void run(String Maszynka) throws  IOException, SQLException {
+
+
+
 			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
 
+
+			try{
+
+
+			    PushFirstLevelOfStructure(Maszynka);
+
+
+            } catch(Exception exc){
+			    
+			    System.out.println("cannot push first level of structure!" + exc);
+                  }
 
 			
 			try {
@@ -83,11 +89,97 @@ public class FetchDataForEachMachine {
 			conn.close();
 			System.out.println("done");
 	}
-		
-		
+
+    private static void PushFirstLevelOfStructure( String Maszynka) throws SQLException {
+		List<Struktury> StrukturyList_FirstLevel = new ArrayList<>();
 
 
-		private static void printInfoOfListofStructuresTest() {
+		Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
+		PreparedStatement sttmnt = null;
+
+			sttmnt= conn.prepareStatement("select seq,ARTIKELCODE ,ONDERDEEL ,CFOMSONDERDEEL ,TYP ,ILOSC ,JEDNOSTKA from struktury s2  where ARTIKELCODE  =?");
+
+			try {
+				sttmnt.setString(1, Maszynka);
+
+				ResultSet rs = sttmnt.executeQuery();
+
+				if (rs.next() == false) {
+					System.out.println("there is no record in  -> " + Maszynka);
+				} else {
+					do {
+
+						String seq = rs.getString("seq");
+						String ARTIKELCODE = rs.getString("ARTIKELCODE");
+						String ONDERDEEL = rs.getString("ONDERDEEL");
+						String CFOMSONDERDEEL = rs.getString("CFOMSONDERDEEL");
+						String TYP = rs.getString("TYP");
+
+
+						Struktury StrukturaTmp = new Struktury(-1); // 0 mean level 0
+						StrukturaTmp.setGlownyProjekt(Maszynka);
+						StrukturaTmp.setSeq(seq);
+						StrukturaTmp.setARTIKELCODE(ARTIKELCODE);
+						StrukturaTmp.setONDERDEEL(ONDERDEEL);
+						StrukturaTmp.setCFOMSONDERDEEL(CFOMSONDERDEEL);
+						StrukturaTmp.setTYP(TYP);
+
+						StrukturyList_FirstLevel.add(StrukturaTmp);
+
+					}while (rs.next());
+				}
+
+//        PushMachineTOStuctureDetail machinePusher = new PushMachineTOStuctureDetail(ListofStructuresTest);
+//        machinePusher.PushStructureToDatabase();
+			} catch (Exception exc) {
+				throw exc;
+			}
+
+//			for(Struktury st : StrukturyList_FirstLevel ) {
+//				st.Show();
+//			}
+
+		sttmnt.close();
+		conn.close();
+
+			// push collected data to GTTDATABASE
+
+		Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
+		PreparedStatement gttstatement = null;
+
+
+		gttstatement = connGTT.prepareStatement("insert into machine_structure_details (MACHINENUMBER ,PARENTARTICLE ,CHILDARTICLE ,QUANTITY ,`TYPE` ,`LEVEL` ) values (?,?,?,?,?,?)");
+
+
+		for(Struktury st :StrukturyList_FirstLevel)
+		{
+
+			try {
+
+
+				gttstatement.setString(1, st.getGlownyProjekt());
+				gttstatement.setString(2, st.getARTIKELCODE());
+				gttstatement.setString(3, st.getONDERDEEL());
+				gttstatement.setInt(4, 0);
+				gttstatement.setString(5, st.getTYP());
+				gttstatement.setInt(6, st.getPoziom());
+
+				gttstatement.addBatch();
+				gttstatement.executeBatch();
+			}
+			catch(Exception e)
+			{
+				throw e;
+			}
+		}
+		connGTT.close();
+		gttstatement.close();
+
+
+    }
+
+
+    private static void printInfoOfListofStructuresTest() {
 			System.out.println("info of Structure: ");
 			System.out.println("size of list : " + ListofStructuresTest.size());
 			System.out.println("Elem[0] : " );
@@ -196,62 +288,61 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 
 			String G = GlownyProjekt;
 			
-			Statement b = conn.createStatement();			
-			ResultSet rs2 = b.executeQuery("select seq,ARTIKELCODE,ONDERDEEL,CFOMSONDERDEEL,TYP,ILOSC,JEDNOSTKA from struktury where ARTIKELCODE = '"+articlecode+"' order by seq");
-			
-			Struktury StrukturaTmp; 
+			Statement b = conn.createStatement();
+			try (ResultSet rs2 = b.executeQuery("select seq,ARTIKELCODE,ONDERDEEL,CFOMSONDERDEEL,TYP,ILOSC,JEDNOSTKA from struktury where ARTIKELCODE = '" + articlecode + "' order by seq")) {
+
+				Struktury StrukturaTmp;
 
 
-			while(rs2.next()){							
-				
-				StrukturaTmp = new Struktury(iloscZaglebien); // 0 mean level 0 
-				StrukturaTmp.setGlownyProjekt(G);
-				StrukturaTmp.setSeq(rs2.getString("seq"));
-				StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
-				StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
-				StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
-				StrukturaTmp.setTYP(rs2.getString("TYP"));
-				
-				
-					if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty())
-					{
-						
-						String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt ,conn);
-						StrukturaTmp.setTYP_Nadrzednego(typeFrom);
-						
-					//	StrukturaTmp.setTYP(rs2.getString("TYP"));
-					//	System.out.println("zostalo dodane dla artikelcode : " +  articlecode);
-						
+				while (rs2.next()) {
 
+					StrukturaTmp = new Struktury(iloscZaglebien); // 0 mean level 0
+					StrukturaTmp.setGlownyProjekt(G);
+					StrukturaTmp.setSeq(rs2.getString("seq"));
+					StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
+					StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
+					StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
+					StrukturaTmp.setTYP(rs2.getString("TYP"));
+
+
+					if (rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
+
+						String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt, conn);
+							StrukturaTmp.setTYP_Nadrzednego(typeFrom);
+
+						//	StrukturaTmp.setTYP(rs2.getString("TYP"));
+						//	System.out.println("zostalo dodane dla artikelcode : " +  articlecode);
+
+
+					} else {
+							StrukturaTmp.setTYP_Nadrzednego("WRONG"); // if the type is not known set is as Y
+						}
+
+
+					//	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
+					//TEMPORARY
+					StrukturaTmp.setILOSC(0.0);
+					StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
+
+
+					ListofStructuresTest.add(StrukturaTmp);
+
+					//
+
+//					System.out.println("\n\n");
+//					for (Struktury st : ListofStructuresTest)
+//						st.Show();
+
+					if (rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
+
+						if (rs2.getString("typ").equals("F") || rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P") || rs2.getString("typ").equals("A")) {
+							iloscZaglebien++;
+							GetAllArticelInProject(rs2.getString("onderdeel"), conn, G);
+						}
 					}
-					else
-					{
-						StrukturaTmp.setTYP_Nadrzednego("WRONG"); // if the type is not known set is as Y
-					}
-
-				
-			//	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
-				//TEMPORARY
-				StrukturaTmp.setILOSC(0.0);
-				StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
-				
-
-
-				ListofStructuresTest.add(StrukturaTmp);
-				
-//		
-//			for(Struktury  st: ListofStructuresTest)
-//				st.Show();
-							
-			if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
-				
-				if(rs2.getString("typ").equals("F")||rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P")){			
-					iloscZaglebien++;
-					GetAllArticelInProject(rs2.getString("onderdeel"),conn,G);
 				}
 			}
-			}
-		//	b.close();
+			//	b.close();
 		//	rs2.close();
 		//	conn.close();
 

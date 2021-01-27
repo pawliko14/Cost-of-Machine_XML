@@ -180,7 +180,7 @@ public class PushStructuresToGTTDB {
 
         // truncate existing data  for replacing
         PreparedStatement sttmnt = null;
-        sttmnt = connGTT.prepareStatement("Truncate table Machine_subprojetcs");
+        sttmnt = connGTT.prepareStatement("Truncate table machine_structure_details");
         sttmnt.addBatch();
         sttmnt.executeBatch();
         sttmnt.close();
@@ -195,7 +195,7 @@ public class PushStructuresToGTTDB {
 
         // truncate existing data  for replacing
         PreparedStatement sttmnt = null;
-        sttmnt = connGTT.prepareStatement("Truncate table machine_structure_details");
+        sttmnt = connGTT.prepareStatement("Truncate table machine_subprojetcs_structure_details");
         sttmnt.addBatch();
         sttmnt.executeBatch();
         sttmnt.close();
