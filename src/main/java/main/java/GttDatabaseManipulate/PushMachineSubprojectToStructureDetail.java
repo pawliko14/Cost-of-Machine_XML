@@ -48,9 +48,8 @@ public class PushMachineSubprojectToStructureDetail {
         {
             System.out.println("there is no data in SUbProjects tabble");
         }
-
         else {
-            while (resultSet.next()) {
+            do{
 
                 String Machinenumber = resultSet.getString("MACHINENUMBER");
 
@@ -61,7 +60,7 @@ public class PushMachineSubprojectToStructureDetail {
                 {
                     System.out.println("cannot add Machine Number to list");
                 }
-            }
+            }while (resultSet.next());
         }
 
 
