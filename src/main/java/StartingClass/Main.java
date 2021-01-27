@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 import main.java.GttDatabaseManipulate.PushStructuresToGTTDB;
 import main.java.costofmachine.FetchDataForEachMachine;
-
+import main.java.costofmachine.FetchSubprojectForEachMachine;
 
 
 public class Main {
@@ -37,10 +37,10 @@ public class Main {
 
 
 				//	PushGeneralProjectsStructuresToDatabase(DBPusherGTT);
-				//	PushSubprojectsStructuresToDatabase();
+					PushSubprojectsStructuresToDatabase(DBPusherGTT);
 
-
-
+					//testing purpose
+				//	PushSubprojectsStructuresToDatabase(DBPusherGTT);
 
 
 
@@ -56,7 +56,7 @@ public class Main {
 
 	private static void PushGeneralProjectsStructuresToDatabase(PushStructuresToGTTDB DBPusherGTT) throws IOException, SQLException {
 
-		//clean - TRUNCATE -table with
+		//clean - TRUNCATE - project table
 		DBPusherGTT.TruncateStructurestable();
 
 		// run for each machine in loop, for now only projects, without subprojetcs
@@ -65,9 +65,16 @@ public class Main {
 		}
 	}
 
-	private static void PushSubprojectsStructuresToDatabase()
-	{
+	private static void PushSubprojectsStructuresToDatabase(PushStructuresToGTTDB DBPusherGTT) throws IOException, SQLException {
+
+		//clean - TRUNCATE - subProject table
+		DBPusherGTT.TruncateSubProjectsTable();
+
 		// gather data for all subprojects from subprojects database
-		//		CountMaterial2test.run(DBPusherGTT.getListOfOpenedMachines().get(0));
+		for(int i = 0 ; i < DBPusherGTT.getListOfSUbProjects().size();i++)
+				FetchSubprojectForEachMachine.run(DBPusherGTT.getListOfSUbProjects().get(i));
+
+
+
 	}
 }

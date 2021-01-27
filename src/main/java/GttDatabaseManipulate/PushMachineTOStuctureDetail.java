@@ -47,7 +47,7 @@ public class PushMachineTOStuctureDetail {
 
 
                 // rows affected
-                System.out.println("done for: " + i);
+             //   System.out.println("done for: " + i);
 
             } catch (SQLException e) {
                 System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());

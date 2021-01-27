@@ -13,15 +13,18 @@ public class PushMachineSubprojectToStructureDetail {
     private String Machine_Name;
     private List<String> Machine_list;
 
-    public PushMachineSubprojectToStructureDetail(List<Struktury> machineStructure, String nachine_name) {
+    public PushMachineSubprojectToStructureDetail(List<Struktury> machineStructure) {
         MachineStructure = new ArrayList<>();
         MachineStructure = machineStructure;
-        Machine_Name = nachine_name;
+    //    Machine_Name = nachine_name;
 
         Machine_list = new ArrayList<>();
 
 
     }
+
+
+
 
     public String getMachine_name()
     {
@@ -124,13 +127,13 @@ public class PushMachineSubprojectToStructureDetail {
 
             try
             {
-
-                sttmnt.setString(1, this.MachineStructure.get(i).getGlownyProjekt());
-                sttmnt.setString(2, this.MachineStructure.get(i).getARTIKELCODE());
-                sttmnt.setString(3, this.MachineStructure.get(i).getONDERDEEL());
-                sttmnt.setInt(4, 0); // temporary 0 as there is no quantity yet
-                sttmnt.setString(5, this.MachineStructure.get(i).getTYP());
-                sttmnt.setInt(6, this.MachineStructure.get(i).getPoziom());
+                sttmnt.setString(1, "temporary");
+                sttmnt.setString(2, this.MachineStructure.get(i).getGlownyProjekt());
+                sttmnt.setString(3, this.MachineStructure.get(i).getARTIKELCODE());
+                sttmnt.setString(4, this.MachineStructure.get(i).getONDERDEEL());
+                sttmnt.setInt(5, 0); // temporary 0 as there is no quantity yet
+                sttmnt.setString(6, this.MachineStructure.get(i).getTYP());
+                sttmnt.setInt(7, this.MachineStructure.get(i).getPoziom());
 
 
                 sttmnt.addBatch();
@@ -138,7 +141,7 @@ public class PushMachineSubprojectToStructureDetail {
 
 
                 // rows affected
-                System.out.println("done for: " + i);
+             //   System.out.println("done for: " + i);
 
             } catch (SQLException e) {
                 System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());

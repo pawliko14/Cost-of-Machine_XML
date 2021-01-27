@@ -71,8 +71,8 @@ public class FetchSubprojectForEachMachine {
 
         //    public PushMachineSubprojectToStructureDetail(List<Struktury> machineStructure, String nachine_name, List<String> machine_subprojetcs)
 
-        PushMachineSubprojectToStructureDetail machineSUbProjectPusher = new PushMachineSubprojectToStructureDetail(ListofStructuresTest,"test");
-
+        PushMachineSubprojectToStructureDetail machineSUbProjectPusher = new PushMachineSubprojectToStructureDetail(ListofStructuresTest);
+        machineSUbProjectPusher.PushStructureToDatabase();
 
 
 

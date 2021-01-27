@@ -188,4 +188,19 @@ public class PushStructuresToGTTDB {
 
         System.out.println("Truncate Table : MachineSubprojects done");
     }
+
+    public void TruncateSubProjectsTable() throws SQLException{
+
+        Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
+
+        // truncate existing data  for replacing
+        PreparedStatement sttmnt = null;
+        sttmnt = connGTT.prepareStatement("Truncate table machine_structure_details");
+        sttmnt.addBatch();
+        sttmnt.executeBatch();
+        sttmnt.close();
+
+
+        System.out.println("Truncate Table : machine_structure_details done");
+    }
 }
