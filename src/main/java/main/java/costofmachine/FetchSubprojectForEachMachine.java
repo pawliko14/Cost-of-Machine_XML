@@ -26,10 +26,7 @@ public class FetchSubprojectForEachMachine {
 
     public FetchSubprojectForEachMachine()
     {
-
     }
-
-
 
 
 
@@ -128,9 +125,6 @@ public class FetchSubprojectForEachMachine {
             throw exc;
         }
 
-//			for(Struktury st : StrukturyList_FirstLevel ) {
-//				st.Show();
-//			}
 
         sttmnt.close();
         conn.close();
@@ -234,17 +228,12 @@ public class FetchSubprojectForEachMachine {
                 ListofStructuresTest.get(i).setCenaMaterialu(0.0);
                 ListofStructuresTest.get(i).setCenaPracy(0.0);
             }
-            else
-            {
-                while(rs2.next())
-                {
-
-                    if(rs2.getString("MATERIAAL").equals("")|| rs2.getString("MATERIAAL").equals(null))
-                    {
+            else {
+                while(rs2.next()) {
+                    if(rs2.getString("MATERIAAL").equals("")|| rs2.getString("MATERIAAL").equals(null)) {
                         ListofStructuresTest.get(i).setCenaMaterialu(0.0);
                     }
-                    else
-                    {
+                    else {
                         ListofStructuresTest.get(i).setCenaMaterialu(Double.parseDouble(rs2.getString("MATERIAAL")));
                     }
                     Double cena = ListofStructuresTest.get(i).getCenaMaterialu();
@@ -254,12 +243,10 @@ public class FetchSubprojectForEachMachine {
                     Double cenaRazyIlosc = cena * ilosc;
                     ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(cenaRazyIlosc);
 
-                    if(rs2.getString("LONEN").equals("")|| rs2.getString("LONEN").equals(null))
-                    {
+                    if(rs2.getString("LONEN").equals("")|| rs2.getString("LONEN").equals(null)) {
                         ListofStructuresTest.get(i).setCenaPracy(0.0);
                     }
-                    else
-                    {
+                    else {
                         ListofStructuresTest.get(i).setCenaPracy(Double.parseDouble(rs2.getString("LONEN")));
 
                     }
@@ -283,60 +270,59 @@ public class FetchSubprojectForEachMachine {
 
         String G = GlownyProjekt;
 
-        Statement b = conn.createStatement();
-        ResultSet rs2 = b.executeQuery("select seq,ARTIKELCODE,ONDERDEEL,CFOMSONDERDEEL,TYP,ILOSC,JEDNOSTKA from struktury where ARTIKELCODE = '"+articlecode+"' order by seq");
+        PreparedStatement b = conn.prepareStatement("select seq,ARTIKELCODE,ONDERDEEL,CFOMSONDERDEEL,TYP,ILOSC,JEDNOSTKA from struktury where ARTIKELCODE = ? order by seq");
+        b.setString(1,articlecode);
 
+
+
+        ResultSet rs2 = b.executeQuery();
         Struktury StrukturaTmp;
 
+        if(rs2.next() == false)
+        {
+         //   System.out.println("there is no record in strcuture, articledcode: " + articlecode );
+        }
+        else {
 
-        while(rs2.next()){
+            do {
 
-            StrukturaTmp = new Struktury(iloscZaglebien); // 0 mean level 0
-            StrukturaTmp.setGlownyProjekt(G);
-            StrukturaTmp.setSeq(rs2.getString("seq"));
-            StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
-            StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
-            StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
-            StrukturaTmp.setTYP(rs2.getString("TYP"));
-
-
-            if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty())
-            {
-
-                String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt ,conn);
-                StrukturaTmp.setTYP_Nadrzednego(typeFrom);
-
-                //	StrukturaTmp.setTYP(rs2.getString("TYP"));
-                //	System.out.println("zostalo dodane dla artikelcode : " +  articlecode);
+                StrukturaTmp = new Struktury(iloscZaglebien); // 0 mean level 0
+                StrukturaTmp.setGlownyProjekt(G);
+                StrukturaTmp.setSeq(rs2.getString("seq"));
+                StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
+                StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
+                StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
+                StrukturaTmp.setTYP(rs2.getString("TYP"));
 
 
-            }
-            else
-            {
-                StrukturaTmp.setTYP_Nadrzednego("WRONG"); // if the type is not known set is as Y
-            }
+                if (rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
+
+                    String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt, conn);
+                    StrukturaTmp.setTYP_Nadrzednego(typeFrom);
 
 
-            //	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
-            //TEMPORARY
-            StrukturaTmp.setILOSC(0.0);
-            StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
-
-
-
-            ListofStructuresTest.add(StrukturaTmp);
-
-//
-//			for(Struktury  st: ListofStructuresTest)
-//				st.Show();
-
-            if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
-
-                if (rs2.getString("typ").equals("F") || rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P") || rs2.getString("typ").equals("A")) {
-                    iloscZaglebien++;
-                    GetAllArticelInProject(rs2.getString("onderdeel"),conn,G);
+                } else {
+                    StrukturaTmp.setTYP_Nadrzednego("W"); // if the type is not known set is as Y
                 }
-            }
+
+
+                //	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
+                //TEMPORARY
+                StrukturaTmp.setILOSC(0.0);
+                StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
+
+
+                ListofStructuresTest.add(StrukturaTmp);
+                ;
+
+                if (rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
+
+                    if (rs2.getString("typ").equals("F") || rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P") || rs2.getString("typ").equals("A") || rs2.getString("typ").equals("Y")) {
+                        iloscZaglebien++;
+                        GetAllArticelInProject(rs2.getString("onderdeel"), conn, G);
+                    }
+                }
+            }while (rs2.next());
         }
         //	b.close();
         //	rs2.close();
@@ -348,19 +334,18 @@ public class FetchSubprojectForEachMachine {
 
     private static String PushValidTypeForHigherLevelOfStructures(String articlecode, String onderdeel,Connection conn) throws SQLException {
 
-        String results = null;
+        PreparedStatement b = conn.prepareStatement("select TYP from struktury s where ONDERDEEL = ? and ARTIKELCODE  = ?");
 
-        Statement b = conn.createStatement();
-        ResultSet rs2 = b.executeQuery("select TYP from struktury s \r\n" +
-                "	where ONDERDEEL  = '"+articlecode+"'\r\n" +
-                "	and ARTIKELCODE  = '"+onderdeel+"'");
 
-        if(rs2.next())
-        {
-            results = rs2.getString("TYP");
-        }
+        b.setString(1,articlecode);
+        b.setString(2,onderdeel);
+        ResultSet rs2 = b.executeQuery();
 
-        return results;
+
+        b.close();
+        rs2.close();
+
+        return (rs2.next()) ? rs2.getString("TYP") : "X";
     }
 
 

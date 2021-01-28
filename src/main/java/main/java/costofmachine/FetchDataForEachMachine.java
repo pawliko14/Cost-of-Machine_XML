@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import main.java.Parameters.Parameters;
 import main.java.GttDatabaseManipulate.PushMachineTOStuctureDetail;
 import main.java.Objetcs.Struktury;
-import org.eclipse.birt.report.model.core.Structure;
 
 
 public class FetchDataForEachMachine {
@@ -37,17 +36,10 @@ public class FetchDataForEachMachine {
 
 
     public static void run(String Maszynka) throws  IOException, SQLException {
-
-
-
 			Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
 
-
 			try{
-
-
 			    PushFirstLevelOfStructure(Maszynka);
-
 
             } catch(Exception exc){
 			    
@@ -135,9 +127,6 @@ public class FetchDataForEachMachine {
 				throw exc;
 			}
 
-//			for(Struktury st : StrukturyList_FirstLevel ) {
-//				st.Show();
-//			}
 
 		sttmnt.close();
 		conn.close();
@@ -288,58 +277,57 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 
 			String G = GlownyProjekt;
 			
-			Statement b = conn.createStatement();
-			try (ResultSet rs2 = b.executeQuery("select seq,ARTIKELCODE,ONDERDEEL,CFOMSONDERDEEL,TYP,ILOSC,JEDNOSTKA from struktury where ARTIKELCODE = '" + articlecode + "' order by seq")) {
+			PreparedStatement b = conn.prepareStatement("select seq,ARTIKELCODE,ONDERDEEL,CFOMSONDERDEEL,TYP,ILOSC,JEDNOSTKA from struktury where ARTIKELCODE = ? order by seq");
+			b.setString(1,articlecode);
+
+			try (ResultSet rs2 = b.executeQuery()) {
 
 				Struktury StrukturaTmp;
 
 
-				while (rs2.next()) {
+				if(rs2.next() == false)
+				{
+					//   System.out.println("there is no record in strcuture, articledcode: " + articlecode );
+				}
+				else {
 
-					StrukturaTmp = new Struktury(iloscZaglebien); // 0 mean level 0
-					StrukturaTmp.setGlownyProjekt(G);
-					StrukturaTmp.setSeq(rs2.getString("seq"));
-					StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
-					StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
-					StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
-					StrukturaTmp.setTYP(rs2.getString("TYP"));
+					do{
+
+						StrukturaTmp = new Struktury(iloscZaglebien); // 0 mean level 0
+						StrukturaTmp.setGlownyProjekt(G);
+						StrukturaTmp.setSeq(rs2.getString("seq"));
+						StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
+						StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
+						StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
+						StrukturaTmp.setTYP(rs2.getString("TYP"));
 
 
-					if (rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
+						if (rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
 
-						String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt, conn);
+							String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt, conn);
 							StrukturaTmp.setTYP_Nadrzednego(typeFrom);
 
-						//	StrukturaTmp.setTYP(rs2.getString("TYP"));
-						//	System.out.println("zostalo dodane dla artikelcode : " +  articlecode);
-
-
-					} else {
-							StrukturaTmp.setTYP_Nadrzednego("WRONG"); // if the type is not known set is as Y
+						} else {
+							StrukturaTmp.setTYP_Nadrzednego("W"); // if the type is not known set is as Y
 						}
 
 
-					//	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
-					//TEMPORARY
-					StrukturaTmp.setILOSC(0.0);
-					StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
+						//	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
+						//TEMPORARY
+						StrukturaTmp.setILOSC(0.0);
+						StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
 
 
-					ListofStructuresTest.add(StrukturaTmp);
+						ListofStructuresTest.add(StrukturaTmp);
 
-					//
+						if (rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
 
-//					System.out.println("\n\n");
-//					for (Struktury st : ListofStructuresTest)
-//						st.Show();
-
-					if (rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
-
-						if (rs2.getString("typ").equals("F") || rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P") || rs2.getString("typ").equals("A")) {
-							iloscZaglebien++;
-							GetAllArticelInProject(rs2.getString("onderdeel"), conn, G);
+							if (rs2.getString("typ").equals("F") || rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P") || rs2.getString("typ").equals("A") || rs2.getString("typ").equals("Y")) {
+								iloscZaglebien++;
+								GetAllArticelInProject(rs2.getString("onderdeel"), conn, G);
+							}
 						}
-					}
+					}while (rs2.next());
 				}
 			}
 			//	b.close();
@@ -351,20 +339,18 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 		
 		
 		private static String PushValidTypeForHigherLevelOfStructures(String articlecode, String onderdeel,Connection conn) throws SQLException {
-			
-			String results = null;
-			
-			Statement b = conn.createStatement();			
-			ResultSet rs2 = b.executeQuery("select TYP from struktury s \r\n" + 
-					"	where ONDERDEEL  = '"+articlecode+"'\r\n" + 
-					"	and ARTIKELCODE  = '"+onderdeel+"'");
-			
-			if(rs2.next())
-			{
-				results = rs2.getString("TYP");
-			}
-						
-			return results;
+
+			PreparedStatement b = conn.prepareStatement("select TYP from struktury s where ONDERDEEL = ? and ARTIKELCODE  = ?");
+
+
+			b.setString(1,articlecode);
+			b.setString(2,onderdeel);
+			ResultSet rs2 = b.executeQuery();
+
+			b.close();
+			rs2.close();
+
+			return (rs2.next()) ? rs2.getString("TYP") : "X";
 		}
 
 

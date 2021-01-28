@@ -48,7 +48,7 @@ public class Main {
 
 
 
-				//	PushGeneralProjectsStructuresToDatabase(DBPusherGTT);
+					PushGeneralProjectsStructuresToDatabase(DBPusherGTT);
 					PushSubprojectsStructuresToDatabase(DBPusherGTT);
 
 
@@ -94,25 +94,13 @@ public class Main {
 	 */
 	private static void PushSubprojectsStructuresToDatabase(PushStructuresToGTTDB DBPusherGTT) throws IOException, SQLException {
 
-		List<String> test = Arrays.asList("21050602");
-
-
 		//clean - TRUNCATE - subProject table
 		DBPusherGTT.TruncateSubProjectsTable();
 
 
-
-
-
-
-		//depoloy purpose
-
 		// gather data for all subprojects from subprojects database
 		for(int i = 0 ; i < DBPusherGTT.getListOfSUbProjects().size();i++)
 			FetchSubprojectForEachMachine.run(DBPusherGTT.getListOfSUbProjects().get(i));
-
-
-
 
 	}
 }
