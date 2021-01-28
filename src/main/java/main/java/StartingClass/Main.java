@@ -2,6 +2,7 @@ package main.java.StartingClass;
 
 import java.awt.EventQueue;
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -47,11 +48,8 @@ public class Main {
 
 
 
-					PushGeneralProjectsStructuresToDatabase(DBPusherGTT);
-				//	PushSubprojectsStructuresToDatabase(DBPusherGTT);
-
-					//testing purpose
-				//	PushSubprojectsStructuresToDatabase(DBPusherGTT);
+				//	PushGeneralProjectsStructuresToDatabase(DBPusherGTT);
+					PushSubprojectsStructuresToDatabase(DBPusherGTT);
 
 
 
@@ -77,27 +75,6 @@ public class Main {
 	 */
 	private static void PushGeneralProjectsStructuresToDatabase(PushStructuresToGTTDB DBPusherGTT) throws IOException, SQLException {
 
-
-		//TESTING
-
-
-
-		//clean - TRUNCATE - project table
-//		DBPusherGTT.TruncateStructurestable();
-//
-//		List<String> temp = Arrays.asList("200535	");
-//
-//		// run for each machine in loop, for now only projects, without subprojetcs
-//
-//			FetchDataForEachMachine.run(temp.get(0));
-
-
-
-
-		//DEPLOY
-
-
-
 		//clean - TRUNCATE - project table
 		DBPusherGTT.TruncateStructurestable();
 
@@ -117,12 +94,23 @@ public class Main {
 	 */
 	private static void PushSubprojectsStructuresToDatabase(PushStructuresToGTTDB DBPusherGTT) throws IOException, SQLException {
 
+		List<String> test = Arrays.asList("21050602");
+
+
 		//clean - TRUNCATE - subProject table
 		DBPusherGTT.TruncateSubProjectsTable();
 
+
+
+
+
+
+		//depoloy purpose
+
 		// gather data for all subprojects from subprojects database
 		for(int i = 0 ; i < DBPusherGTT.getListOfSUbProjects().size();i++)
-				FetchSubprojectForEachMachine.run(DBPusherGTT.getListOfSUbProjects().get(i));
+			FetchSubprojectForEachMachine.run(DBPusherGTT.getListOfSUbProjects().get(i));
+
 
 
 

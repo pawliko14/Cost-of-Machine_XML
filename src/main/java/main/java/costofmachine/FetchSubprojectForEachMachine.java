@@ -18,7 +18,7 @@ public class FetchSubprojectForEachMachine {
     private static Map<String,String> ListaGlownychZlozenIPodzlozen;
     //testowa struktura, na potrzeby programu Asi
     private static ArrayList<Struktury> ListofStructuresTest;
-    private static int iloscZaglebien = 0;
+    private static int iloscZaglebien = 1;
     private static Double CalosciowaCenaPracy = 0.0;
     private static Double CalosciowaCenaKonstrukcja = 0.0;
     private static Double CalosciowaCenaMaterialu = 0.0;
@@ -36,7 +36,16 @@ public class FetchSubprojectForEachMachine {
     public static void run(String Maszynka) throws IOException, SQLException {
         Connection conn= DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
 
+        try{
 
+
+            PushFirstLevelOfStructure(Maszynka);
+
+
+        } catch(Exception exc){
+
+            System.out.println("cannot push first level of structure! ->  " + exc);
+        }
 
         try {
             ListofStructuresTest = new ArrayList<Struktury>();
@@ -46,12 +55,12 @@ public class FetchSubprojectForEachMachine {
 
 
             Set<Map.Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
-            int it = 0;
+            int it = 1;
             for(Map.Entry<String, String> entry: entrySet) {
                 GlownyProjektDlaArtykulu = entry.getValue();
                 System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
                 GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);
-                iloscZaglebien= 0; // reset deppth of the structure
+                iloscZaglebien= 1; // reset deppth of the structure
                 it++;
             }
 
@@ -64,12 +73,6 @@ public class FetchSubprojectForEachMachine {
             e.printStackTrace();
         }
 
-     //   PushMachineTOStuctureDetail machinePusher = new PushMachineTOStuctureDetail(ListofStructuresTest);
-     //   machinePusher.PushStructureToDatabase();
-
-
-
-        //    public PushMachineSubprojectToStructureDetail(List<Struktury> machineStructure, String nachine_name, List<String> machine_subprojetcs)
 
         PushMachineSubprojectToStructureDetail machineSUbProjectPusher = new PushMachineSubprojectToStructureDetail(ListofStructuresTest);
         machineSUbProjectPusher.PushStructureToDatabase(Maszynka);
@@ -80,7 +83,95 @@ public class FetchSubprojectForEachMachine {
         System.out.println("done");
     }
 
+    private static void PushFirstLevelOfStructure( String Maszynka) throws SQLException {
+        List<Struktury> StrukturyList_FirstLevel = new ArrayList<>();
 
+
+        Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
+        PreparedStatement sttmnt = null;
+
+        sttmnt= conn.prepareStatement("select seq,ARTIKELCODE ,ONDERDEEL ,CFOMSONDERDEEL ,TYP ,ILOSC ,JEDNOSTKA from struktury s2  where ARTIKELCODE  =?");
+
+        try {
+            sttmnt.setString(1, Maszynka);
+
+            ResultSet rs = sttmnt.executeQuery();
+
+            if (rs.next() == false) {
+                System.out.println("there is no record in  -> " + Maszynka);
+            } else {
+                do {
+
+                    String seq = rs.getString("seq");
+                    String ARTIKELCODE = rs.getString("ARTIKELCODE");
+                    String ONDERDEEL = rs.getString("ONDERDEEL");
+                    String CFOMSONDERDEEL = rs.getString("CFOMSONDERDEEL");
+                    String TYP = rs.getString("TYP");
+
+
+                    Struktury StrukturaTmp = new Struktury(0); // 0 mean level 0
+                    StrukturaTmp.setGlownyProjekt(Maszynka);
+                    StrukturaTmp.setSeq(seq);
+                    StrukturaTmp.setARTIKELCODE(ARTIKELCODE);
+                    StrukturaTmp.setONDERDEEL(ONDERDEEL);
+                    StrukturaTmp.setCFOMSONDERDEEL(CFOMSONDERDEEL);
+                    StrukturaTmp.setTYP(TYP);
+
+                    StrukturyList_FirstLevel.add(StrukturaTmp);
+
+                }while (rs.next());
+            }
+
+//        PushMachineTOStuctureDetail machinePusher = new PushMachineTOStuctureDetail(ListofStructuresTest);
+//        machinePusher.PushStructureToDatabase();
+        } catch (Exception exc) {
+            throw exc;
+        }
+
+//			for(Struktury st : StrukturyList_FirstLevel ) {
+//				st.Show();
+//			}
+
+        sttmnt.close();
+        conn.close();
+
+        // push collected data to GTTDATABASE
+        Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
+        PreparedStatement gttstatement = null;
+
+
+        gttstatement = connGTT.prepareStatement("insert into machine_subprojetcs_structure_details (MACHINENUMBER ,MACHINESUBPROJECTNUMBER,PARENTARTICLE ,CHILDARTICLE ,QUANTITY ,`TYPE` ,`LEVEL` ) values (?,?,?,?,?,?,?)");
+
+
+        // change subproject  20053502 to main project 200535 etc...
+        String MachineNameCUtLast2Char = Maszynka.substring(0,Maszynka.length()-2);
+
+        for(Struktury st :StrukturyList_FirstLevel)
+        {
+
+            try {
+
+                gttstatement.setString(1, MachineNameCUtLast2Char);
+                gttstatement.setString(2, st.getGlownyProjekt());
+                gttstatement.setString(3, st.getARTIKELCODE());
+                gttstatement.setString(4, st.getONDERDEEL());
+                gttstatement.setInt(5, 0);
+                gttstatement.setString(6, st.getTYP());
+                gttstatement.setInt(7, st.getPoziom());
+
+                gttstatement.addBatch();
+                gttstatement.executeBatch();
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
+        connGTT.close();
+        gttstatement.close();
+
+
+    }
 
 
     private static void printInfoOfListofStructuresTest() {
@@ -241,7 +332,7 @@ public class FetchSubprojectForEachMachine {
 
             if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
 
-                if(rs2.getString("typ").equals("F")||rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P")){
+                if (rs2.getString("typ").equals("F") || rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P") || rs2.getString("typ").equals("A")) {
                     iloscZaglebien++;
                     GetAllArticelInProject(rs2.getString("onderdeel"),conn,G);
                 }

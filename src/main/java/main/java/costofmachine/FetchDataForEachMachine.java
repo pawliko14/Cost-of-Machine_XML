@@ -23,7 +23,7 @@ public class FetchDataForEachMachine {
 	private static Map<String,String> ListaGlownychZlozenIPodzlozen;
 	//testowa struktura, na potrzeby programu Asi
 	private static ArrayList<Struktury>ListofStructuresTest;
-	private static int iloscZaglebien = 0;
+	private static int iloscZaglebien = 1;
 	private static Double CalosciowaCenaPracy = 0.0;
 	private static Double CalosciowaCenaKonstrukcja = 0.0;
 	private static Double CalosciowaCenaMaterialu = 0.0;
@@ -63,12 +63,12 @@ public class FetchDataForEachMachine {
 						
 							
 										Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
-										int it = 0;
+										int it = 1;
 										for(Entry<String, String> entry: entrySet) {
 											GlownyProjektDlaArtykulu = entry.getValue();
 											System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
 											GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);		
-											iloscZaglebien= 0; // reset deppth of the structure
+											iloscZaglebien= 1; // reset deppth of the structure
 											it++;
 										}					
 						
@@ -116,7 +116,7 @@ public class FetchDataForEachMachine {
 						String TYP = rs.getString("TYP");
 
 
-						Struktury StrukturaTmp = new Struktury(-1); // 0 mean level 0
+						Struktury StrukturaTmp = new Struktury(0); // 0 mean level 0
 						StrukturaTmp.setGlownyProjekt(Maszynka);
 						StrukturaTmp.setSeq(seq);
 						StrukturaTmp.setARTIKELCODE(ARTIKELCODE);
