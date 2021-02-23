@@ -1,8 +1,5 @@
 package main.java.GttDatabaseManipulate;
 
-
-
-import java.lang.reflect.Array;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,10 +91,7 @@ public class PushStructuresToGTTDB {
                         sttmnt_3.addBatch();
                         sttmnt_3.executeBatch();
                     }
-              //      sttmnt_3.close();
                 }
-
-
 
             }
 
@@ -174,19 +168,19 @@ public class PushStructuresToGTTDB {
     }
 
 
-    public void TruncateStructurestable() throws SQLException {
+    public void TruncateStructuresTable() throws SQLException {
 
         Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
 
         // truncate existing data  for replacing
         PreparedStatement sttmnt = null;
-        sttmnt = connGTT.prepareStatement("Truncate table Machine_subprojetcs");
+        sttmnt = connGTT.prepareStatement("Truncate table machine_structure_details");
         sttmnt.addBatch();
         sttmnt.executeBatch();
         sttmnt.close();
 
 
-        System.out.println("Truncate Table : MachineSubprojects done");
+        System.out.println("Truncate Table : machine_structure_details done");
     }
 
     public void TruncateSubProjectsTable() throws SQLException{

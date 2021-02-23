@@ -50,8 +50,12 @@ public class FetchSubprojectForEachMachine {
             for(Map.Entry<String, String> entry: entrySet) {
                 GlownyProjektDlaArtykulu = entry.getValue();
                 System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
+
+                // Recursive function - crawler over 'structures' table
                 GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);
-                iloscZaglebien= 0; // reset deppth of the structure
+
+
+                iloscZaglebien= 0; // reset depth of the structure
                 it++;
             }
 
@@ -64,12 +68,7 @@ public class FetchSubprojectForEachMachine {
             e.printStackTrace();
         }
 
-     //   PushMachineTOStuctureDetail machinePusher = new PushMachineTOStuctureDetail(ListofStructuresTest);
-     //   machinePusher.PushStructureToDatabase();
 
-
-
-        //    public PushMachineSubprojectToStructureDetail(List<Struktury> machineStructure, String nachine_name, List<String> machine_subprojetcs)
 
         PushMachineSubprojectToStructureDetail machineSUbProjectPusher = new PushMachineSubprojectToStructureDetail(ListofStructuresTest);
         machineSUbProjectPusher.PushStructureToDatabase();
@@ -123,7 +122,6 @@ public class FetchSubprojectForEachMachine {
 
     }
 
-    // dlugosc wykonywania operacji jest zbyt dlugi do testowania ( ostatni run trwal 1,5h)
 
 
 
@@ -215,18 +213,12 @@ public class FetchSubprojectForEachMachine {
                 String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt ,conn);
                 StrukturaTmp.setTYP_Nadrzednego(typeFrom);
 
-                //	StrukturaTmp.setTYP(rs2.getString("TYP"));
-                //	System.out.println("zostalo dodane dla artikelcode : " +  articlecode);
-
-
             }
-            else
-            {
+            else {
                 StrukturaTmp.setTYP_Nadrzednego("WRONG"); // if the type is not known set is as Y
             }
 
 
-            //	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
             //TEMPORARY
             StrukturaTmp.setILOSC(0.0);
             StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
@@ -235,9 +227,6 @@ public class FetchSubprojectForEachMachine {
 
             ListofStructuresTest.add(StrukturaTmp);
 
-//
-//			for(Struktury  st: ListofStructuresTest)
-//				st.Show();
 
             if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
 
@@ -247,9 +236,7 @@ public class FetchSubprojectForEachMachine {
                 }
             }
         }
-        //	b.close();
-        //	rs2.close();
-        //	conn.close();
+
 
         iloscZaglebien -=  1;
     }

@@ -213,24 +213,19 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 				StrukturaTmp.setTYP(rs2.getString("TYP"));
 				
 				
-					if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty())
-					{
+					if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
 						
 						String typeFrom = PushValidTypeForHigherLevelOfStructures(articlecode, GlownyProjekt ,conn);
 						StrukturaTmp.setTYP_Nadrzednego(typeFrom);
-						
-					//	StrukturaTmp.setTYP(rs2.getString("TYP"));
-					//	System.out.println("zostalo dodane dla artikelcode : " +  articlecode);
-						
 
 					}
-					else
-					{
+					else {
 						StrukturaTmp.setTYP_Nadrzednego("WRONG"); // if the type is not known set is as Y
 					}
 
 				
 			//	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
+
 				//TEMPORARY
 				StrukturaTmp.setILOSC(0.0);
 				StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
@@ -238,22 +233,25 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 
 
 				ListofStructuresTest.add(StrukturaTmp);
-				
-//		
-//			for(Struktury  st: ListofStructuresTest)
-//				st.Show();
+
 							
 			if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
 				
 				if(rs2.getString("typ").equals("F")||rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P")){			
 					iloscZaglebien++;
+
+
+
+						//recursives
 					GetAllArticelInProject(rs2.getString("onderdeel"),conn,G);
 				}
 			}
 			}
-		//	b.close();
-		//	rs2.close();
-		//	conn.close();
+
+//			b.close();
+//			rs2.close();
+//			conn.close();
+
 
 			iloscZaglebien -=  1;
 		}

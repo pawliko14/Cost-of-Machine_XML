@@ -16,10 +16,7 @@ public class PushMachineSubprojectToStructureDetail {
     public PushMachineSubprojectToStructureDetail(List<Struktury> machineStructure) {
         MachineStructure = new ArrayList<>();
         MachineStructure = machineStructure;
-    //    Machine_Name = nachine_name;
-
         Machine_list = new ArrayList<>();
-
 
     }
 

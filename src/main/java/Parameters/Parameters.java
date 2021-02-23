@@ -1,13 +1,16 @@
 package main.java.Parameters;
 
 public class Parameters {
-	
-	private static String PathOfSavingNomenclatuurTxt = "C:\\Users\\el08\\Desktop\\programiki\\Cost_of_machine\\Moneyy.txt";
-	private static String PathOfSavingAfterCalculationsTxt ="C:\\Users\\el08\\Desktop\\programiki\\Cost_of_machine\\KalkulacjaKoncowa.txt";
-	private static String PathOfSavingAnaliza_MaszynPDF ="C://Users/el08/Desktop/programiki/Cost_of_machine/Analiza_maszyn.pdf";
-	private static String PathOfSavingAnaliza_Maszyn_kalkulacjaKoncowaPDF ="C://Users/el08/Desktop/programiki/Cost_of_machine/Analiza_maszyn_Kalkulacja_koncowa.pdf";
-	
-	
+
+//	private static String PathOfSavingNomenclatuurTxt = "C:\\Users\\el08\\Desktop\\programiki\\Cost_of_machine\\Structure_examp.txt";
+//	private static String PathOfSavingAfterCalculationsTxt ="C:\\Users\\el08\\Desktop\\programiki\\Cost_of_machine\\KalkulacjaKoncowa.txt";
+//	private static String PathOfSavingAnaliza_MaszynPDF ="C://Users/el08/Desktop/programiki/Cost_of_machine/Analiza_maszyn.pdf";
+//	private static String PathOfSavingAnaliza_Maszyn_kalkulacjaKoncowaPDF ="C://Users/el08/Desktop/programiki/Cost_of_machine/Analiza_maszyn_Kalkulacja_koncowa.pdf";
+
+	private static String PathOfSavingNomenclatuurTxt = "\\\\dataserver\\Common\\Programy\\GTT_FAT\\Structure_examp.txt";
+	private static String PathOfSavingAfterCalculationsTxt ="\\\\dataserver\\Common\\Programy\\GTT_FAT\\KalkulacjaKoncowa.txt";
+	private static String PathOfSavingAnaliza_MaszynPDF ="\\\\dataserver\\Common\\Programy\\GTT_FAT\\Analiza_maszyn.pdf";
+	private static String PathOfSavingAnaliza_Maszyn_kalkulacjaKoncowaPDF ="\\\\dataserver\\Common\\Programy\\GTT_FAT\\Analiza_maszyn_Kalkulacja_koncowa.pdf";
 	
 	public static String getPathOfSavingAnaliza_Maszyn_kalkulacjaKoncowaPDF() {
 		return PathOfSavingAnaliza_Maszyn_kalkulacjaKoncowaPDF;
