@@ -37,7 +37,8 @@ public class PushMachineTOStuctureDetail {
                 sttmnt.setString(1, this.MachineStructure.get(i).getGlownyProjekt());
                 sttmnt.setString(2, this.MachineStructure.get(i).getARTIKELCODE());
                 sttmnt.setString(3, this.MachineStructure.get(i).getONDERDEEL());
-                sttmnt.setInt(4, 0); // temporary 0 as there is no quantity yet
+//                sttmnt.setInt(4, 0); // temporary 0 as there is no quantity yet
+                sttmnt.setDouble(4, this.MachineStructure.get(i).getILOSC()); // temporary 0 as there is no quantity yet
                 sttmnt.setString(5, this.MachineStructure.get(i).getTYP());
                 sttmnt.setInt(6, this.MachineStructure.get(i).getPoziom());
 
@@ -47,7 +48,7 @@ public class PushMachineTOStuctureDetail {
 
 
                 // rows affected
-             //   System.out.println("done for: " + i);
+                System.out.println("done for: " + i);
 
             } catch (SQLException e) {
                 System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());

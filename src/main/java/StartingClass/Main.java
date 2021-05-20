@@ -30,8 +30,8 @@ public class Main {
 
 
 					// push Projects and Subprojects to database
-					DBPusherGTT.PushOpenProjectListTODB();
-					DBPusherGTT.PushSubProjectsToDB();
+				//	DBPusherGTT.PushOpenProjectListTODB();
+			//		DBPusherGTT.PushSubProjectsToDB();
 
 
 
@@ -39,7 +39,7 @@ public class Main {
 
 
 					// CAREFUL - truncate previous data, replace with new one, takes ~~30min to finish this algorythm
-					PushSubprojectsStructuresToDatabase(DBPusherGTT);
+			//		PushSubprojectsStructuresToDatabase(DBPusherGTT);
 
 
 
@@ -57,7 +57,7 @@ public class Main {
 
 		if(testingPurpose)
 		{
-			List<String> machines_remporary  = Arrays.asList("210500", "210503");
+			List<String> machines_remporary  = Arrays.asList("200520");
 
 			//clean - TRUNCATE - project table
 			DBPusherGTT.TruncateStructuresTable();

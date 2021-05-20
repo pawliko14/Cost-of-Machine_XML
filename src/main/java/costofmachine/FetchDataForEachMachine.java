@@ -6,11 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -53,20 +49,20 @@ public class FetchDataForEachMachine {
 					 ListofStructuresTest = new ArrayList<Struktury>();				 			 			 
 					 ListaGlownychZlozenIPodzlozen = new LinkedHashMap<String,String>(); // LinkedHashMap - preserver the insertion order, have to used Linked one
 					 getListaGLownychZlozen(Maszynka,conn);
-					 
-						
+
+				add_F_articlesToMainList(ListaGlownychZlozenIPodzlozen,conn, Maszynka);
 							
 										Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
 										int it = 0;
 										for(Entry<String, String> entry: entrySet) {
 											GlownyProjektDlaArtykulu = entry.getValue();
 											System.out.println(" "+ it + ": " + entry.getKey() + " : " + entry.getValue());
-											GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);		
+											GetAllArticelInProject(entry.getKey(),conn,GlownyProjektDlaArtykulu);
 											iloscZaglebien= 0; // reset deppth of the structure
 											it++;
 										}					
 						
-									GetAllPrices(conn);									
+								//	GetAllPrices(conn);
 									ShowAll();
 	 							 
 			}
@@ -83,11 +79,55 @@ public class FetchDataForEachMachine {
 			conn.close();
 			System.out.println("done");
 	}
-		
-		
+
+	private static void add_F_articlesToMainList(Map<String, String> listaGlownychZlozenIPodzlozen, Connection conn, String maszynka) throws SQLException {
+
+		Struktury StrukturaTmp;
+		PreparedStatement pstmnt= null;
 
 
-		private static void printInfoOfListofStructuresTest() {
+		Set<Entry<String,String>> entrySet = ListaGlownychZlozenIPodzlozen.entrySet();
+		for(Entry<String, String> entry: entrySet) {
+			String f_article = entry.getKey();
+
+			String sql = "select seq,ARTIKELCODE,ONDERDEEL,CFOMSONDERDEEL,TYP,ILOSC,JEDNOSTKA \n" +
+					"from struktury \n" +
+					"where ONDERDEEL = ? \n" +
+					"and ARTIKELCODE  = ? \n" +
+					"order by seq";
+
+			pstmnt = conn.prepareStatement(sql);
+			pstmnt.setString(1,f_article);
+			pstmnt.setString(2,maszynka);
+
+
+			ResultSet rs2 = pstmnt.executeQuery();
+
+
+			while(rs2.next())
+			{
+				StrukturaTmp = new Struktury(-1); // -1 temporary, this article should be at the top of all other articles (eq. -> 0 )
+
+				StrukturaTmp.setGlownyProjekt(maszynka);
+				StrukturaTmp.setSeq(rs2.getString("seq"));
+				StrukturaTmp.setARTIKELCODE(rs2.getString("ARTIKELCODE"));
+				StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
+				StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
+				StrukturaTmp.setTYP(rs2.getString("TYP"));
+				StrukturaTmp.setILOSC(rs2.getDouble("ILOSC"));
+
+				ListofStructuresTest.add(StrukturaTmp);
+			}
+			rs2.close();
+
+		}
+		 pstmnt.close();
+
+	}
+
+
+
+	private static void printInfoOfListofStructuresTest() {
 			System.out.println("info of Structure: ");
 			System.out.println("size of list : " + ListofStructuresTest.size());
 			System.out.println("Elem[0] : " );
@@ -164,7 +204,7 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 						Double ilosc = ListofStructuresTest.get(i).getILOSC();
 
 						
-						Double cenaRazyIlosc = cena * ilosc;				
+						Double cenaRazyIlosc = 0.0;// cena * ilosc;
 						ListofStructuresTest.get(i).setCenaMaterialuRazyIlosc(cenaRazyIlosc);
 						
 						if(rs2.getString("LONEN").equals("")|| rs2.getString("LONEN").equals(null))
@@ -177,7 +217,7 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 
 						}
 						Double cenaPracySzt = ListofStructuresTest.get(i).getCenaPracy();
-						Double pracaRazyIlosc = cenaPracySzt * ilosc;
+						Double pracaRazyIlosc =  0.0;// cenaPracySzt * ilosc;
 						
 						ListofStructuresTest.get(i).setCenaPracyRazyIlosc(pracaRazyIlosc);
 						
@@ -224,10 +264,9 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 					}
 
 				
-			//	StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
 
-				//TEMPORARY
-				StrukturaTmp.setILOSC(0.0);
+
+				StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
 				StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
 				
 
@@ -237,10 +276,8 @@ private static void GetAllPrices(Connection conn) throws SQLException {
 							
 			if(rs2.getString("TYP") != null && !rs2.getString("TYP").isEmpty()) {
 				
-				if(rs2.getString("typ").equals("F")||rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P")){			
+				if( rs2.getString("typ").equals("Y") ||rs2.getString("typ").equals("A") || rs2.getString("typ").equals("F")||rs2.getString("onderdeel").startsWith("%") || rs2.getString("typ").equals("P")){
 					iloscZaglebien++;
-
-
 
 						//recursives
 					GetAllArticelInProject(rs2.getString("onderdeel"),conn,G);
