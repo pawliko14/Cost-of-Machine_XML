@@ -57,7 +57,7 @@ public class Main {
 
 		if(testingPurpose)
 		{
-			List<String> machines_remporary  = Arrays.asList("200520");
+			List<String> machines_remporary  = Arrays.asList("20052020");
 
 			//clean - TRUNCATE - project table
 			DBPusherGTT.TruncateStructuresTable();

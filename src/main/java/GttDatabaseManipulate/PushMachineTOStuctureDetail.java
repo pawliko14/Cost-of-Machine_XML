@@ -1,7 +1,4 @@
 package main.java.GttDatabaseManipulate;
-
-
-
 import main.java.Objetcs.Struktury;
 
 import java.sql.Connection;
@@ -28,17 +25,15 @@ public class PushMachineTOStuctureDetail {
 
         for(int i = 0 ; i < this.MachineStructure.size();i++)
         {
-            sttmnt= connGTT.prepareStatement("insert into machine_structure_details (MACHINENUMBER ,PARENTARTICLE ,CHILDARTICLE ,QUANTITY ,`TYPE` ,`LEVEL` )\r\n" +
+            sttmnt= connGTT.prepareStatement("insert into machine_structure_details (MACHINENUMBER ,PARENTARTICLE ,ARTICLE ,QUANTITY ,`TYPE` ,`LEVEL` )\r\n" +
                     "values (?,?,?,?,?,?)");
 
             try
             {
-
                 sttmnt.setString(1, this.MachineStructure.get(i).getGlownyProjekt());
                 sttmnt.setString(2, this.MachineStructure.get(i).getARTIKELCODE());
                 sttmnt.setString(3, this.MachineStructure.get(i).getONDERDEEL());
-//                sttmnt.setInt(4, 0); // temporary 0 as there is no quantity yet
-                sttmnt.setDouble(4, this.MachineStructure.get(i).getILOSC()); // temporary 0 as there is no quantity yet
+                sttmnt.setDouble(4, this.MachineStructure.get(i).getILOSC());
                 sttmnt.setString(5, this.MachineStructure.get(i).getTYP());
                 sttmnt.setInt(6, this.MachineStructure.get(i).getPoziom());
 
@@ -46,8 +41,6 @@ public class PushMachineTOStuctureDetail {
                 sttmnt.addBatch();
                 sttmnt.executeBatch();
 
-
-                // rows affected
                 System.out.println("done for: " + i);
 
             } catch (SQLException e) {
@@ -57,32 +50,8 @@ public class PushMachineTOStuctureDetail {
             }
         }
 
-  //      sttmnt.close();
+        sttmnt.close();
         connGTT.close();
-
-    }
-
-
-
-    // test
-    private  void insertionTest(Connection connection) {
-
-        String SQL_INSERT = "insert into Machine (ID,MACHINENUMBER ) values (?,?)";
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
-             PreparedStatement preparedStatement = conn.prepareStatement(SQL_INSERT)) {
-            preparedStatement.setInt(1, 2);
-            preparedStatement.setString(2, "21090");
-
-
-            int row = preparedStatement.executeUpdate();
-            System.out.println(row); //1
-
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 

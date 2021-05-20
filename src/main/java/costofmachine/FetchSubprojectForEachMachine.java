@@ -1,7 +1,6 @@
 package main.java.costofmachine;
 
 import main.java.GttDatabaseManipulate.PushMachineSubprojectToStructureDetail;
-import main.java.GttDatabaseManipulate.PushMachineTOStuctureDetail;
 import main.java.Objetcs.Struktury;
 import main.java.Parameters.Parameters;
 
@@ -16,7 +15,6 @@ public class FetchSubprojectForEachMachine {
 
     static String GlownyProjektDlaArtykulu = "";
     private static Map<String,String> ListaGlownychZlozenIPodzlozen;
-    //testowa struktura, na potrzeby programu Asi
     private static ArrayList<Struktury> ListofStructuresTest;
     private static int iloscZaglebien = 0;
     private static Double CalosciowaCenaPracy = 0.0;
