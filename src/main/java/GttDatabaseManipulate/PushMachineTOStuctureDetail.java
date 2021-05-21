@@ -41,7 +41,7 @@ public class PushMachineTOStuctureDetail {
                 sttmnt.addBatch();
                 sttmnt.executeBatch();
 
-                System.out.println("done for: " + i);
+                System.out.println("done for: " + this.MachineStructure.get(i).getONDERDEEL());
 
             } catch (SQLException e) {
                 System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());

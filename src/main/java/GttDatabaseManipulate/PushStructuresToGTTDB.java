@@ -1,5 +1,7 @@
 package main.java.GttDatabaseManipulate;
 
+import main.java.Objetcs.OpenedMachines;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,20 +112,23 @@ public class PushStructuresToGTTDB {
      * @throws SQLException
      */
     public void PushOpenProjectListTODB() throws SQLException {
-
-
-
-        // get current state of projects
-        this.GetListOfOpenedProjects();
-
         Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
 
         // truncate existing data  for replacing
         PreparedStatement sttmnt = null;
-            sttmnt = connGTT.prepareStatement("Truncate table Machine");
-            sttmnt.addBatch();
-            sttmnt.executeBatch();
+        sttmnt = connGTT.prepareStatement("Truncate table Machine");
+        sttmnt.addBatch();
+        sttmnt.executeBatch();
         sttmnt.close();
+
+        // get current state of projects
+        this.GetListOfOpenedProjects();
+
+        // check for Structure existance
+        this.CheckIfStrucuteExistsForProject(this.OpenedMachines);
+
+
+
 
         // add listofOpenProjects
 
@@ -137,10 +142,77 @@ public class PushStructuresToGTTDB {
             sttmnt_2.addBatch();
             sttmnt_2.executeBatch();
         }
+
+        // check for Structure existance
+        this.CheckIfStrucuteExistsForProject(this.OpenedMachines);
+
         sttmnt_2.close();
         connGTT.close();
     }
 
+
+    private void CheckIfStrucuteExistsForProject(List<String> openedMachines) throws SQLException {
+
+
+        Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
+        PreparedStatement sttmnt = null;
+        ResultSet rs = null;
+
+
+        for(String o : openedMachines) {
+
+            sttmnt = conn.prepareStatement("select ARTIKELCODE from struktury s \n" +
+                    "where ARTIKELCODE  = ?");
+
+            sttmnt.setString(1,o);
+            rs = sttmnt.executeQuery();
+
+
+
+            if (rs.next() == false) {
+                System.out.println("There is no structure for : " +  o);
+
+                setStructureExistance(o, false);
+
+
+            } else {
+                do {
+                    setStructureExistance(o, true);
+                } while (rs.next());
+            }
+
+        }
+        sttmnt.close();
+        rs.close();
+        conn.close();
+    }
+
+    private void setStructureExistance(String o, boolean b) throws SQLException {
+
+        int existanceOfStructure = 0;
+
+        if (b == true) {
+            existanceOfStructure = 1;
+        }
+
+        Connection connGTT = DriverManager.getConnection("jdbc:mariadb://192.168.90.101/gttdatabase", "gttuser", "gttpassword");
+        PreparedStatement sttmnt = null;
+
+        sttmnt = connGTT.prepareStatement("UPDATE Machine\n" +
+                "SET EXISTINGSTRUCTURE = ?\n" +
+                "WHERE MACHINENUMBER  = ? ");
+
+
+        sttmnt.setInt(1,existanceOfStructure);
+        sttmnt.setString(2,o);
+        ResultSet resultSet = sttmnt.executeQuery();
+
+
+
+        sttmnt.close();
+        resultSet.close();
+        connGTT.close();
+    }
 
     private void GetListOfOpenedProjects() throws SQLException {
 
@@ -148,15 +220,15 @@ public class PushStructuresToGTTDB {
         Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
         PreparedStatement sttmnt = null;
 
-        sttmnt = conn.prepareStatement("SELECT AFDELINGSEQ  FROM BESTELLING b \n" +
-                "WHERE STATUSCODE  = 'O'\n" +
-                "and (AFDELING  =2 or AFDELING =5 or AFDELING = 14 or AFDELING = 7)\n" +
-                "GROUP BY AFDELINGSEQ ");
+        sttmnt = conn.prepareStatement("SELECT ORDERNUMMER FROM BESTELLING b \n" +
+                "where STATUSCODE  = 'O'\n" +
+                "and (leverancier =2 or leverancier =5 or leverancier = 14 )\n" +
+                "GROUP BY AFDELINGSEQ");
 
         ResultSet resultSet = sttmnt.executeQuery();
 
         while (resultSet.next()) {
-            String name = resultSet.getString("AFDELINGSEQ");
+            String name = resultSet.getString("ORDERNUMMER");
             this.OpenedMachines.add(name);
 
 
@@ -189,12 +261,12 @@ public class PushStructuresToGTTDB {
 
         // truncate existing data  for replacing
         PreparedStatement sttmnt = null;
-        sttmnt = connGTT.prepareStatement("Truncate table machine_structure_details");
+        sttmnt = connGTT.prepareStatement("Truncate table machine_subprojetcs_structure_details");
         sttmnt.addBatch();
         sttmnt.executeBatch();
         sttmnt.close();
 
 
-        System.out.println("Truncate Table : machine_structure_details done");
+        System.out.println("Truncate Table : machine_subprojetcs_structure_details done");
     }
 }
