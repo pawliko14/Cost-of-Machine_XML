@@ -31,7 +31,7 @@ public class Main {
 
 
 	// set to False if need real data from database
-	private static 	boolean testingPurpose = true;
+	private static 	boolean testingPurpose = false;
 
 
 	public static void main(String[] args) {
