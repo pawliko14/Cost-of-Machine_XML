@@ -1,10 +1,13 @@
 package main.java.GttDatabaseManipulate;
 
+import com.StructureAnalyzer.GeneralProjects.GerneralMachineFInder;
+import com.StructureAnalyzer.GeneralProjects.MainMachine;
 import main.java.Objetcs.OpenedMachines;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class PushStructuresToGTTDB {
 
@@ -116,13 +119,13 @@ public class PushStructuresToGTTDB {
 
         // truncate existing data  for replacing
         PreparedStatement sttmnt = null;
-        sttmnt = connGTT.prepareStatement("Truncate table Machine");
-        sttmnt.addBatch();
-        sttmnt.executeBatch();
-        sttmnt.close();
+            sttmnt = connGTT.prepareStatement("Truncate table Machine");
+            sttmnt.addBatch();
+            sttmnt.executeBatch();
+            sttmnt.close();
 
         // get current state of projects
-        this.GetListOfOpenedProjects();
+          this.GetListOfOpenedProjects();
 
         // check for Structure existance
         this.CheckIfStrucuteExistsForProject(this.OpenedMachines);
@@ -135,9 +138,14 @@ public class PushStructuresToGTTDB {
         PreparedStatement sttmnt_2 = null;
         for(int  i = 0 ; i < OpenedMachines.size() ; i ++)
         {
-            sttmnt_2 =connGTT.prepareStatement("insert into Machine (MACHINENUMBER ) values (?)");
-            sttmnt_2.setString(1, this.OpenedMachines.get(i));
+                String separator = "/";
+                String [] parts = OpenedMachines.get(i).split(Pattern.quote(separator));
+                String leverancier = parts[0];
+                String machineNumber = parts[1];
 
+            sttmnt_2 =connGTT.prepareStatement("insert into Machine (MACHINENUMBER,LEVERANCIER ) values (?,?)");
+            sttmnt_2.setString(1, machineNumber);
+            sttmnt_2.setString(2, leverancier);
 
             sttmnt_2.addBatch();
             sttmnt_2.executeBatch();
@@ -161,23 +169,25 @@ public class PushStructuresToGTTDB {
 
         for(String o : openedMachines) {
 
+            String [] parts = o.split("/");
+            String machineNumber = parts[1];
+
             sttmnt = conn.prepareStatement("select ARTIKELCODE from struktury s \n" +
                     "where ARTIKELCODE  = ?");
 
-            sttmnt.setString(1,o);
+            sttmnt.setString(1,machineNumber);
             rs = sttmnt.executeQuery();
 
 
 
             if (rs.next() == false) {
-                System.out.println("There is no structure for : " +  o);
+                System.out.println("There is no structure for : " +  machineNumber);
 
-                setStructureExistance(o, false);
-
+                setStructureExistance(machineNumber, false);
 
             } else {
                 do {
-                    setStructureExistance(o, true);
+                    setStructureExistance(machineNumber, true);
                 } while (rs.next());
             }
 
@@ -214,29 +224,26 @@ public class PushStructuresToGTTDB {
         connGTT.close();
     }
 
-    private void GetListOfOpenedProjects() throws SQLException {
+    /**
+     *
+     * function that returns list of opened project ready to process by further analysis,
+     *
+     * ANNOTATION,
+     * function compared to gtt analyse is incomplete, there are missing projects which are opened
+     * even project not strictly related to machines(2.5.14)
+     *
+     * @throws SQLException
+     */
+   private void GetListOfOpenedProjects() throws SQLException {
 
 
-        Connection conn=DriverManager.getConnection("jdbc:mariadb://192.168.90.123/fatdb","listy","listy1234");
-        PreparedStatement sttmnt = null;
+       GerneralMachineFInder gerneralMachineFInder = new GerneralMachineFInder();
+        List<MainMachine> mainMachines = gerneralMachineFInder.doOperations();
 
-        sttmnt = conn.prepareStatement("SELECT ORDERNUMMER FROM BESTELLING b \n" +
-                "where STATUSCODE  = 'O'\n" +
-                "and (leverancier =2 or leverancier =5 or leverancier = 14 )\n" +
-                "GROUP BY AFDELINGSEQ");
+       for(MainMachine mm : mainMachines) {
+           this.OpenedMachines.add(mm.getLeverancier() + "/" + mm.getOrdernummer());
+       }
 
-        ResultSet resultSet = sttmnt.executeQuery();
-
-        while (resultSet.next()) {
-            String name = resultSet.getString("ORDERNUMMER");
-            this.OpenedMachines.add(name);
-
-
-
-        }
-        sttmnt.close();
-        resultSet.close();
-        conn.close();
     }
 
 

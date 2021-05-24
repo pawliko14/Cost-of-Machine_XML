@@ -23,14 +23,14 @@ public class FetchMachineAndExistingStructure {
 
         while (resultSet.next()) {
 
-
             String machineNumber = resultSet.getString("MACHINENUMBER");
             boolean existanceOfStructure = resultSet.getBoolean("EXISTINGSTRUCTURE");
 
             OpenedMachines obj = new OpenedMachines(machineNumber, existanceOfStructure);
-            this.openedMachines.add(obj);
 
-
+            if( openedMachines != null) {
+                this.openedMachines.add(obj);
+            }
 
         }
         sttmnt.close();
