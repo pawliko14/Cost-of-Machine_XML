@@ -1,9 +1,7 @@
 package main.java.GttDatabaseManipulate;
 
 
-
 import main.java.Objetcs.Struktury;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +17,6 @@ public class PushMachineSubprojectToStructureDetail {
         Machine_list = new ArrayList<>();
 
     }
-
-
 
 
     public String getMachine_name()
@@ -128,7 +124,7 @@ public class PushMachineSubprojectToStructureDetail {
                 sttmnt.setString(2, this.MachineStructure.get(i).getGlownyProjekt());
                 sttmnt.setString(3, this.MachineStructure.get(i).getARTIKELCODE());
                 sttmnt.setString(4, this.MachineStructure.get(i).getONDERDEEL());
-                sttmnt.setInt(5, 0); // temporary 0 as there is no quantity yet
+                sttmnt.setDouble(5, this.MachineStructure.get(i).getILOSC());
                 sttmnt.setString(6, this.MachineStructure.get(i).getTYP());
                 sttmnt.setInt(7, this.MachineStructure.get(i).getPoziom());
 
@@ -136,9 +132,6 @@ public class PushMachineSubprojectToStructureDetail {
                 sttmnt.addBatch();
                 sttmnt.executeBatch();
 
-
-                // rows affected
-             //   System.out.println("done for: " + i);
 
             } catch (SQLException e) {
                 System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
