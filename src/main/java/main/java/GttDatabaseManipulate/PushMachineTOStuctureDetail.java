@@ -30,12 +30,36 @@ public class PushMachineTOStuctureDetail {
 
             try
             {
-                sttmnt.setString(1, this.MachineStructure.get(i).getGlownyProjekt());
-                sttmnt.setString(2, this.MachineStructure.get(i).getARTIKELCODE());
-                sttmnt.setString(3, this.MachineStructure.get(i).getONDERDEEL());
-                sttmnt.setDouble(4, this.MachineStructure.get(i).getILOSC());
-                sttmnt.setString(5, this.MachineStructure.get(i).getTYP());
-                sttmnt.setInt(6, this.MachineStructure.get(i).getPoziom());
+                String GlownyProject = this.MachineStructure.get(i).getGlownyProjekt();
+                String Artikelcode = this.MachineStructure.get(i).getARTIKELCODE();
+                String OnderDeel = this.MachineStructure.get(i).getONDERDEEL();
+                double ilosc = this.MachineStructure.get(i).getILOSC();
+                String Type = this.MachineStructure.get(i).getTYP();
+                int poziom = this.MachineStructure.get(i).getPoziom();
+
+                // handle nulls
+                if(GlownyProject == null || GlownyProject.equals("")) {
+                    GlownyProject = "null";
+                }
+                if(Artikelcode == null || Artikelcode.equals("")) {
+                    Artikelcode = "null";
+                }
+                if(OnderDeel == null || OnderDeel.equals("")) {
+                    OnderDeel = "null";
+                }
+                if(ilosc == 0) {
+                    ilosc = 0;
+                }
+                if(Type == null || Type.equals("")) {
+                    Type = "N";
+                }
+
+                sttmnt.setString(1, GlownyProject);
+                sttmnt.setString(2, Artikelcode);
+                sttmnt.setString(3, OnderDeel);
+                sttmnt.setDouble(4, ilosc);
+                sttmnt.setString(5, Type);
+                sttmnt.setInt(6, poziom);
 
 
                 sttmnt.addBatch();

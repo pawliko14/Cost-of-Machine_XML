@@ -156,7 +156,14 @@ public class FetchDataForEachMachine {
 				StrukturaTmp.setONDERDEEL(rs2.getString("ONDERDEEL"));
 				StrukturaTmp.setCFOMSONDERDEEL(rs2.getString("CFOMSONDERDEEL"));
 				StrukturaTmp.setTYP(rs2.getString("TYP"));
-				StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
+				try {
+					StrukturaTmp.setILOSC(Double.parseDouble(rs2.getString("ILOSC")));
+				}
+				catch(Exception e) {
+					System.out.println("ERROR WITH DOUBLE PARSING : " + articlecode + " , main projct : " + GlownyProjekt);
+					System.out.println(e);
+
+				}
 				StrukturaTmp.setJEDNOSTKA(rs2.getString("JEDNOSTKA"));
 
 

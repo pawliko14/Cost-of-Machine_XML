@@ -40,7 +40,7 @@ public class Main {
 			public void run() {
 				try {
 
-					redirectSysOutToFile();
+					redirectedOutToFile();
 					printCurrentTime();
 						Logic();
 					printCurrentTime();
@@ -63,17 +63,29 @@ public class Main {
 		System.out.println(formatter.format(date));
 	}
 
-	private static void redirectSysOutToFile() throws IOException {
-		if(Files.exists(Paths.get(Parameters.getPathToLogFile()))) {
-			File file = new File(Parameters.getPathToLogFile());
-			PrintStream stream = new PrintStream(file);
-			System.setOut(stream);
-		}else {
+	private static void redirectedOutToFile() throws IOException {
+
+		// sysOut
+		if(Files.exists(Paths.get(Parameters.getPathToLogFile())) ) {
+			Files.delete(Paths.get(Parameters.getPathToLogFile()));
+
+		}
 			File file = new File(Parameters.getPathToLogFile());
 			file.createNewFile();
-			PrintStream stream = new PrintStream(file);
-			System.setOut(stream);
+				PrintStream stream = new PrintStream(file);
+				System.setOut(stream);
+
+
+		//sysErr
+		if(Files.exists(Paths.get(Parameters.getPathToLogFileError()))) {
+			Files.delete(Paths.get(Parameters.getPathToLogFileError()));
 		}
+			File fileErr = new File(Parameters.getPathToLogFileError());
+			fileErr.createNewFile();
+				PrintStream streamErr = new PrintStream(fileErr);
+				System.setErr(streamErr);
+
+
 
 	}
 
@@ -88,12 +100,12 @@ public class Main {
 	private static void Logic() throws SQLException, IOException {
 
 //		//push available projects to database
-		PushStructuresToGTTDB DBPusherGTT = new PushStructuresToGTTDB();
-
-
-		// push Projects and Subprojects to database
-		DBPusherGTT.PushOpenProjectListTODB();
-		DBPusherGTT.PushSubProjectsToDB();
+//		PushStructuresToGTTDB DBPusherGTT = new PushStructuresToGTTDB();
+//
+//
+//		// push Projects and Subprojects to database
+//		DBPusherGTT.PushOpenProjectListTODB();
+//		DBPusherGTT.PushSubProjectsToDB();
 
 
 		// retrive information about machines structure existance
@@ -121,7 +133,7 @@ public class Main {
 		if(testingPurpose)
 		{
 			List<OpenedMachines> testingOpenedMachines =  new ArrayList<>();
-				testingOpenedMachines.add(new OpenedMachines("7112401",true));
+				testingOpenedMachines.add(new OpenedMachines("190702",true));
 
 
 			//clean - TRUNCATE - project table
