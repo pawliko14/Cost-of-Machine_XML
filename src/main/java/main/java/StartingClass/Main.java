@@ -2,7 +2,6 @@ package main.java.StartingClass;
 
 import java.awt.EventQueue;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -30,7 +29,7 @@ import main.java.costofmachine.FetchSubprojectForEachMachine;
 public class Main {
 
 
-	// set to False if need real data from database
+		// set to True if sample data is needed, otherwise program will start completely
 	private static 	boolean testingPurpose = false;
 
 
@@ -41,9 +40,9 @@ public class Main {
 				try {
 
 					redirectedOutToFile();
-					printCurrentTime();
+					timeMeasure();
 						Logic();
-					printCurrentTime();
+					timeMeasure();
 
 
 				} catch (Exception e) {
@@ -56,7 +55,7 @@ public class Main {
 		});
 	}
 
-	private static void printCurrentTime() {
+	private static void timeMeasure() {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 		Date date = new Date(System.currentTimeMillis());
 
@@ -100,12 +99,12 @@ public class Main {
 	private static void Logic() throws SQLException, IOException {
 
 //		//push available projects to database
-//		PushStructuresToGTTDB DBPusherGTT = new PushStructuresToGTTDB();
-//
-//
-//		// push Projects and Subprojects to database
-//		DBPusherGTT.PushOpenProjectListTODB();
-//		DBPusherGTT.PushSubProjectsToDB();
+		PushStructuresToGTTDB DBPusherGTT = new PushStructuresToGTTDB();
+
+
+		// push Projects and Subprojects to database
+		DBPusherGTT.PushOpenProjectListTODB();
+		DBPusherGTT.PushSubProjectsToDB();
 
 
 		// retrive information about machines structure existance
